@@ -5,8 +5,8 @@ dayjs.extend(duration);
 const RENDER_DATE_FORMAT = 'MMM D';
 const ATTRIBUTE_DATE_FORMAT = 'YYYY-MM-DD';
 const RENDER_TIME_FORMAT = 'HH:mm';
-const ATTRIBUTE_TIME_FORMAT = 'YYYY-MM-DDTHH-mm';
-const POINT_EDIT_FORMAT = 'DD/MM/YYHH:mm';
+const ATTRIBUTE_TIME_FORMAT = 'YYYY-MM-DD THH-mm';
+const POINT_EDIT_FORMAT = 'DD/MM/YY HH:mm';
 
 function getRandomInteger (a = 0, b = 1){
   const lower = Math.ceil(Math.min(a, b));
