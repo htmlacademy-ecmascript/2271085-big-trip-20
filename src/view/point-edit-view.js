@@ -1,4 +1,4 @@
-import {createElement} from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 import {POINT_EMPTY} from '../const.js';
 import {humanizeRenderEditPointDate} from '../utils.js';
 
@@ -185,30 +185,23 @@ function createPointEditOffersTemplate (pointOffers,type,checkedOffers){
   return data;
 }
 
-export default class PointEditView {
+export default class PointEditView extends AbstractView {
+  #point = null;
+  #destination = null;
+  #pointOffers = null;
+
   constructor({point = POINT_EMPTY, pointDestination, pointOffers}) {
-    this.point = point;
-    this.destination = pointDestination;
-    this.pointOffers = pointOffers;
+    super();
+    this.#point = point;
+    this.#destination = pointDestination;
+    this.#pointOffers = pointOffers;
   }
 
-  getTemplate() {
+  get template() {
     return createPointEditTemplate({
-      point : this.point,
-      pointDestination : this.destination,
-      pointOffers : this.pointOffers,
+      point : this.#point,
+      pointDestination : this.#destination,
+      pointOffers : this.#pointOffers,
     });
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
   }
 }
