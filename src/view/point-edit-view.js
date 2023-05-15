@@ -189,12 +189,24 @@ export default class PointEditView extends AbstractView {
   #point = null;
   #destination = null;
   #pointOffers = null;
+  #onResetClick = null;
+  #onSubmitClick = null;
 
-  constructor({point = POINT_EMPTY, pointDestination, pointOffers}) {
+  constructor({point = POINT_EMPTY, pointDestination, pointOffers, onResetClick, onSubmitClick}) {
     super();
     this.#point = point;
     this.#destination = pointDestination;
     this.#pointOffers = pointOffers;
+    this.#onResetClick = onResetClick;
+    this.#onSubmitClick = onSubmitClick;
+
+    this.element
+      .querySelector('.event__reset-btn')
+      .addEventListener('click', this.#resetClickHandler);
+
+    this.element
+      .querySelector('.event__save-btn')
+      .addEventListener('click',this.#submitClickHandler);
   }
 
   get template() {
@@ -204,4 +216,16 @@ export default class PointEditView extends AbstractView {
       pointOffers : this.#pointOffers,
     });
   }
+
+  #resetClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#onResetClick();
+  };
+
+  #submitClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#onSubmitClick();
+  };
+
+
 }
