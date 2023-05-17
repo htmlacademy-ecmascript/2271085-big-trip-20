@@ -1,4 +1,4 @@
-import {getRandomArrayElement,getRandomInteger} from '../utils.js';
+import {getRandomArrayElement,getRandomInteger,filter} from '../utils.js';
 import { CITIES, DESCRIPTION,BASE_PRICE,Duration} from '../const.js';
 import dayjs from 'dayjs';
 
@@ -54,4 +54,13 @@ function getDate({next}) {
   }
   return date;
 }
-export {generatePoint,generateDestination,generateOffer};
+
+function generateFilters(points){
+  return Object.entries(filter)
+    .map(([filterType, filterPoints]) => ({
+      type: filterType,
+      hasPoints: filterPoints(points).length > 0
+    }));
+}
+
+export {generatePoint,generateDestination,generateOffer,generateFilters};
