@@ -1,5 +1,5 @@
 const WAYPOINT_TYPES = [ 'taxi','bus','train','ship','drive','flight','check-in','sightseeing','restaurant'];
-const POINT_COUNT = 3;
+const POINT_COUNT = 5;
 const DESTINATION_COUNT = 5;
 const OFFER_COUNT = 3;
 const DEFAULT_TYPE = 'flight';
@@ -25,4 +25,11 @@ const Duration = {
   MIN: 59,
 };
 
-export {POINT_COUNT, OFFER_COUNT,WAYPOINT_TYPES, POINT_EMPTY, CITIES, DESCRIPTION,BASE_PRICE,DESTINATION_COUNT,Duration};
+const FilterType = {
+  EVERYTHING: 'everything',
+  FUTURE: 'future',
+  PRESENT: 'present',
+  PAST: 'past',
+};
+
+export {FilterType,POINT_COUNT, OFFER_COUNT,WAYPOINT_TYPES, POINT_EMPTY, CITIES, DESCRIPTION,BASE_PRICE,DESTINATION_COUNT,Duration};

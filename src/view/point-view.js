@@ -66,14 +66,11 @@ function createPointTemplate ({point, pointDestination, pointOffers}) {
 
 function createPointOffersTemplate (pointOffers) {
   const data = pointOffers.map((pointOffer) =>
-    (
-      `<li class="event__offer">
+    `<li class="event__offer">
       <span class="event__offer-title">${pointOffer.title}</span>
       &plus;&euro;&nbsp;
       <span class="event__offer-price">${pointOffer.price}</span>
-      </li>`
-    )
-  );
+    </li>`).join('');
   return data;
 }
 
