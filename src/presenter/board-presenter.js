@@ -1,14 +1,14 @@
-import { render,replace,RenderPosition } from '../framework/render.js';
+import { render,RenderPosition } from '../framework/render.js';
+import {updateItem} from '../utils.js';
 import EventListView from '../view/event-list-view';
-import PointEditView from '../view/point-edit-view';
 import SortView from '../view/sort-view';
-import PointView from '../view/point-view';
 import EmptyView from '../view/empty-view.js';
 import PointPresenter from './point-presenter.js';
 export default class BoardPresenter {
   #container = null;
   #pointsModel = null;
   #boardPoints = [];
+  #pointPresenters = new Map();
 
   #sortComponent = new SortView();
   #eventListComponent = new EventListView();
@@ -53,8 +53,25 @@ export default class BoardPresenter {
   #renderPoint(point) {
     const pointPresenter = new PointPresenter({
       container: this.#container,
-      pointsModel: this.#pointsModel
+      pointsModel: this.#pointsModel,
+      onDataChange: this.#handlerPointChange,
+      onModeChange: this.#handleModeChange,
     });
     pointPresenter.init(point);
+    this.#pointPresenters.set(point.id, pointPresenter);
   }
+
+  #clearPoints() {
+    this.#pointPresenters.forEach((presenter) => presenter.destroy());
+    this.#pointPresenters.clear();
+  }
+
+  #handleModeChange = () => {
+    this.#pointPresenters.forEach((presenter) => presenter.resetView());
+  };
+
+  #handlerPointChange = (updatedPoint) => {
+    this.#boardPoints = updateItem(this.#boardPoints, updatedPoint);
+    this.#pointPresenters.get(updatedPoint.id).init(updatedPoint);
+  };
 }

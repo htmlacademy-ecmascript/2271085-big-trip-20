@@ -74,4 +74,8 @@ const filter = {
   [FilterType.PAST]: (points) => points.filter((point) => isPointPast(point)),
 };
 
-export {getRandomInteger,getRandomArrayElement,filter,capitalize,humanizeRenderEditPointDate,humanizeRenderPointDate, humanizeAttributePointDate,humanizeAttributePointTime,humanizeRenderPointTime,calculateDuration};
+function updateItem(items, update) {
+  return items.map((item) => item.id === update.id ? update : item);
+}
+
+export {getRandomInteger,getRandomArrayElement,filter,capitalize,humanizeRenderEditPointDate,humanizeRenderPointDate, humanizeAttributePointDate,humanizeAttributePointTime,humanizeRenderPointTime,calculateDuration,updateItem};
