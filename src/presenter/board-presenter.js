@@ -1,5 +1,5 @@
 import { render,RenderPosition } from '../framework/render.js';
-import {updateItem, sortPointUp} from '../utils.js';
+import {updateItem, sortPointByTime, sortPointByPrice,sortPointByDay} from '../utils.js';
 import EventListView from '../view/event-list-view';
 import SortView from '../view/sort-view';
 import EmptyView from '../view/empty-view.js';
@@ -11,7 +11,7 @@ export default class BoardPresenter {
   #boardPoints = [];
   #sourcedPoints = [];
   #pointPresenters = new Map();
-  #currentSortType = SortType.PRICE;
+  #currentSortType = SortType.DAY;
   #sortComponent = null;
   #eventListComponent = new EventListView();
   #emptyViewComponent = new EmptyView();
@@ -32,13 +32,13 @@ export default class BoardPresenter {
   #sortPoints = (sortType) =>{
     switch(sortType){
       case SortType.TIME:
-        this.#boardPoints.sort(sortPointUp);
+        this.#boardPoints.sort(sortPointByTime);
         break;
       case SortType.PRICE:
-        this.#boardPoints = this.#boardPoints.sort((a,b) => b.basePrice - a.basePrice);
+        this.#boardPoints.sort(sortPointByPrice);
         break;
       default:
-        this.#boardPoints = [...this.#sourcedPoints];
+        this.#boardPoints.sort(sortPointByDay);
     }
     this.#currentSortType = sortType;
   };
