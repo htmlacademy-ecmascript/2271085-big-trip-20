@@ -74,8 +74,30 @@ const filter = {
   [FilterType.PAST]: (points) => points.filter((point) => isPointPast(point)),
 };
 
+const sortPointByTime = (pointA, pointB) => {
+  const timeA = dayjs(pointA.dateTo).diff(dayjs(pointA.dateFrom));
+  const timeB = dayjs(pointB.dateTo).diff(dayjs(pointB.dateFrom));
+  return timeB - timeA;
+};
+
+const sortPointByPrice = (pointA, pointB) => pointB.basePrice - pointA.basePrice;
+
+const sortPointByDay = (pointA, pointB) =>dayjs(pointA.dateFrom) - dayjs(pointB.dateFrom);
+
 function updateItem(items, update) {
   return items.map((item) => item.id === update.id ? update : item);
 }
 
-export {getRandomInteger,getRandomArrayElement,filter,capitalize,humanizeRenderEditPointDate,humanizeRenderPointDate, humanizeAttributePointDate,humanizeAttributePointTime,humanizeRenderPointTime,calculateDuration,updateItem};
+export {getRandomInteger,
+  getRandomArrayElement,
+  filter,
+  sortPointByTime,
+  sortPointByPrice,
+  sortPointByDay,
+  capitalize,
+  humanizeRenderEditPointDate,
+  humanizeRenderPointDate,
+  humanizeAttributePointDate,
+  humanizeAttributePointTime,
+  humanizeRenderPointTime,calculateDuration,
+  updateItem};
