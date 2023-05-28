@@ -1,7 +1,7 @@
 const WAYPOINT_TYPES = [ 'taxi','bus','train','ship','drive','flight','check-in','sightseeing','restaurant'];
 const POINT_COUNT = 5;
 const DESTINATION_COUNT = 5;
-const OFFER_COUNT = 3;
+const OFFER_COUNT = 5;
 const DEFAULT_TYPE = 'flight';
 const POINT_EMPTY = {
   basePrice: 0,
