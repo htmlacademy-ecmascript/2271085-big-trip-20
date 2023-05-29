@@ -158,37 +158,18 @@ function createPhotosDestinationsTemplate(srcs){
 function createPointEditOffersTemplate (pointOffers,type,checkedOffers){
 
   const typeOffers = pointOffers.find((way) => way.type === type);
-  console.log('typeoffers', typeOffers);
-
-  let data = '';
-
 
   const checkedOffersIds = checkedOffers.map((offer) => offer.id);
 
-  for (let i = 0; i < typeOffers.offers.length; i++){
-    if(checkedOffersIds.includes(typeOffers.offers[i].id)){
-      data +=
-      ` <div class="event__offer-selector">
-      <input class="event__offer-checkbox  visually-hidden" id="${typeOffers.offers[i].id}" type="checkbox" name="event-offer-luggage" checked>
+  return typeOffers.offers.map((item) => `
+  <div class="event__offer-selector">
+      <input class="event__offer-checkbox  visually-hidden" id="${item.id}" type="checkbox" name="event-offer-luggage" ${checkedOffersIds.includes(item.id) ? 'checked' : ''}>
       <label class="event__offer-label" for="event-offer-luggage-1">
-        <span class="event__offer-title">${typeOffers.offers[i].title}</span>
+        <span class="event__offer-title">${item.title}</span>
         &plus;&euro;&nbsp;
-        <span class="event__offer-price">${typeOffers.offers[i].price}</span>
+        <span class="event__offer-price">${item.price}</span>
       </label>
-    </div>`;
-    } else {
-      data +=
-    ` <div class="event__offer-selector">
-    <input class="event__offer-checkbox  visually-hidden" id="${typeOffers[i].id}" type="checkbox" name="event-offer-luggage">
-    <label class="event__offer-label" for="event-offer-luggage-1">
-      <span class="event__offer-title">${typeOffers.offers[i].title}</span>
-      &plus;&euro;&nbsp;
-      <span class="event__offer-price">${typeOffers.offers[i].price}</span>
-    </label>
-  </div>`;
-    }
-  }
-  return data;
+   </div> `);
 }
 
 export default class PointEditView extends AbstractStatefulView {
@@ -235,6 +216,10 @@ export default class PointEditView extends AbstractStatefulView {
       .querySelector('.event__input--destination')
       .addEventListener('change', this.#destinationInputClick);
 
+    this.element
+      .querySelector('.event__input--price')
+      .addEventListener('change', this.#priceInputChange);
+
     const offerBlock = this.element
       .querySelector('.event__available-offers');
 
@@ -257,13 +242,13 @@ export default class PointEditView extends AbstractStatefulView {
 
   #offerCLickHandler = (evt) => {
     evt.preventDefault();
-
+console.log('work');
     const checkedBoxes = Array.from(this.element.querySelectorAll('.event__offer-checkbox:checked'));
-
+    console.log('checkedBoxes', checkedBoxes);
     this._setState({
       point: {
         ...this._state.point,
-        offers: checkedBoxes.map((element) => element.dataset.offerId)
+        offers: checkedBoxes.map((element) => element.id)
       }
     });
   };
@@ -277,6 +262,18 @@ export default class PointEditView extends AbstractStatefulView {
         destination: evt.target.value
       }
     });
+  };
+
+  #priceInputChange = (evt) => {
+    evt.preventDefault();
+console.log('price work');
+    this._setState({
+      point:{
+        ...this._state.point,
+        basePrice: evt.target.valueAsNumber
+      }
+    });
+    console.log(this._state);
   };
 
   #resetClickHandler = (evt) => {
