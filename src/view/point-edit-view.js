@@ -177,13 +177,15 @@ export default class PointEditView extends AbstractStatefulView {
   #pointOffers = null;
   #onResetClick = null;
   #onSubmitClick = null;
+  #allDestinations = null;
 
-  constructor({point = POINT_EMPTY, pointDestination, pointOffers, onResetClick, onSubmitClick}) {
+  constructor({point = POINT_EMPTY, pointDestination, pointOffers, onResetClick, onSubmitClick,allDestinations}) {
     super();
     this.#destination = pointDestination;
     this.#pointOffers = pointOffers;
     this.#onResetClick = onResetClick;
     this.#onSubmitClick = onSubmitClick;
+    this.#allDestinations = allDestinations;
 
     this._setState(PointEditView.parsePointToState({point}));
 
@@ -214,11 +216,15 @@ export default class PointEditView extends AbstractStatefulView {
 
     this.element
       .querySelector('.event__input--destination')
-      .addEventListener('change', this.#destinationInputClick);
+      .addEventListener('change', this.#destinationInputChange);
 
     this.element
       .querySelector('.event__input--price')
       .addEventListener('change', this.#priceInputChange);
+
+    this.element
+      .querySelector('.event__input--destination')
+      .addEventListener('change', this.#destinationInputChange);
 
     const offerBlock = this.element
       .querySelector('.event__available-offers');
@@ -253,17 +259,6 @@ console.log('work');
     });
   };
 
-  #destinationInputClick = (evt) => {
-    evt.preventDefault();
-
-    this.updateElement({
-      point: {
-        ...this._state.point,
-        destination: evt.target.value
-      }
-    });
-  };
-
   #priceInputChange = (evt) => {
     evt.preventDefault();
 console.log('price work');
@@ -274,6 +269,25 @@ console.log('price work');
       }
     });
     console.log(this._state);
+  };
+
+  #destinationInputChange = (evt) => {
+    evt.preventDefault();
+    console.log(this.#allDestinations);
+
+    const selectedDestination = this.#allDestinations
+      .find((pointDestination) => pointDestination.name === evt.target.value);
+
+    const selectedDestinationId = (selectedDestination)
+      ? selectedDestination.id
+      : null;
+
+    this.updateElement({
+      point: {
+        ...this._state.point,
+        destination: selectedDestinationId
+      }
+    });
   };
 
   #resetClickHandler = (evt) => {
