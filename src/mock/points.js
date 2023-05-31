@@ -18,6 +18,20 @@ const generateDestination = () => {
   };
 };
 
+const generateCityDestination = (city) =>
+  ({
+    id: crypto.randomUUID(),
+    name: city,
+    description: DESCRIPTION,
+    pictures: [
+      {
+        'src': `https://loremflickr.com/248/152?random=${crypto.randomUUID()}`,
+        'description': `${city} description`
+      }
+    ]
+  });
+
+
 const generateOffer = (type) => ({
   id: crypto.randomUUID(),
   title: `Offer ${type}`,
@@ -63,4 +77,4 @@ function generateFilters(points){
     }));
 }
 
-export {generatePoint,generateDestination,generateOffer,generateFilters};
+export {generatePoint,generateDestination,generateCityDestination,generateOffer,generateFilters};

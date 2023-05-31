@@ -2,9 +2,10 @@ import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import {POINT_EMPTY} from '../const.js';
 import {humanizeRenderEditPointDate} from '../utils.js';
 
-function createPointEditTemplate ({state, pointDestination, pointOffers}) {
+function createPointEditTemplate ({state, pointDestination, pointOffers,allDestinations}) {
 
-  const {type, basePrice, dateFrom, dateTo, offers} = state.point;
+  const {type, basePrice, dateFrom, dateTo, offers, destination} = state.point;
+  console.log('firstState.point', state.point);
 
   const startRenderEditPointDate = humanizeRenderEditPointDate(dateFrom);
   const endRenderEditPointDate = humanizeRenderEditPointDate(dateTo);
@@ -12,6 +13,7 @@ function createPointEditTemplate ({state, pointDestination, pointOffers}) {
   const generatePointEditOffers = (pointType, availableOffers) => {
     const typeOffers = availableOffers.find((way) => way.type === pointType);
     const checkedOffersCollection = [];
+
     for (let i = 0; i < offers.length; i ++){
       checkedOffersCollection.push(typeOffers.offers.find((offer) => offer.id === offers[i]));
     }
@@ -19,11 +21,19 @@ function createPointEditTemplate ({state, pointDestination, pointOffers}) {
   };
   const checkedOffers = generatePointEditOffers(type,pointOffers);
 
-  function getPhotosSRC(destinations){
-    const data = destinations.pictures.map((pictureObject) => pictureObject.src);
+  function getStateDestination(newdestination){
+    const data = allDestinations.find((punkt) => punkt.id === newdestination);
     return data;
   }
-  const photosSRC = getPhotosSRC(pointDestination);
+
+  const stateDestination = getStateDestination(destination);
+
+  function getPhotosSRC(destin){
+
+    const data = destin.pictures.map((pictureObject) => pictureObject.src);
+    return data;
+  }
+  const photosSRC = getPhotosSRC(stateDestination);
 
   return (
     `<li class="trip-events__item">
@@ -92,11 +102,9 @@ function createPointEditTemplate ({state, pointDestination, pointOffers}) {
           <label class="event__label  event__type-output" for="event-destination-1">
             ${type}
           </label>
-          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value=${pointDestination.name} list="destination-list-1">
+          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value=${stateDestination.name} list="destination-list-1">
           <datalist id="destination-list-1">
-            <option value="Amsterdam"></option>
-            <option value="Geneva"></option>
-            <option value="Chamonix"></option>
+          ${createDestinationsList(allDestinations)}
           </datalist>
         </div>
 
@@ -144,7 +152,10 @@ function createPointEditTemplate ({state, pointDestination, pointOffers}) {
   </li>`
   );
 }
-
+function createDestinationsList (allDestinations){
+  return allDestinations.map((destination) =>`
+  <option value="${destination.name}"></option>`).join('');
+}
 
 function createPhotosDestinationsTemplate(srcs){
   const data = srcs.map((photo) =>
@@ -164,12 +175,12 @@ function createPointEditOffersTemplate (pointOffers,type,checkedOffers){
   return typeOffers.offers.map((item) => `
   <div class="event__offer-selector">
       <input class="event__offer-checkbox  visually-hidden" id="${item.id}" type="checkbox" name="event-offer-luggage" ${checkedOffersIds.includes(item.id) ? 'checked' : ''}>
-      <label class="event__offer-label" for="event-offer-luggage-1">
+      <label class="event__offer-label" for="${item.id}">
         <span class="event__offer-title">${item.title}</span>
         &plus;&euro;&nbsp;
         <span class="event__offer-price">${item.price}</span>
       </label>
-   </div> `);
+   </div> `).join('');
 }
 
 export default class PointEditView extends AbstractStatefulView {
@@ -179,6 +190,7 @@ export default class PointEditView extends AbstractStatefulView {
   #onSubmitClick = null;
   #allDestinations = null;
 
+
   constructor({point = POINT_EMPTY, pointDestination, pointOffers, onResetClick, onSubmitClick,allDestinations}) {
     super();
     this.#destination = pointDestination;
@@ -186,6 +198,7 @@ export default class PointEditView extends AbstractStatefulView {
     this.#onResetClick = onResetClick;
     this.#onSubmitClick = onSubmitClick;
     this.#allDestinations = allDestinations;
+
 
     this._setState(PointEditView.parsePointToState({point}));
 
@@ -198,6 +211,7 @@ export default class PointEditView extends AbstractStatefulView {
       state : this._state,
       pointDestination : this.#destination,
       pointOffers : this.#pointOffers,
+      allDestinations: this.#allDestinations
     });
   }
 
@@ -222,10 +236,6 @@ export default class PointEditView extends AbstractStatefulView {
       .querySelector('.event__input--price')
       .addEventListener('change', this.#priceInputChange);
 
-    this.element
-      .querySelector('.event__input--destination')
-      .addEventListener('change', this.#destinationInputChange);
-
     const offerBlock = this.element
       .querySelector('.event__available-offers');
 
@@ -248,9 +258,9 @@ export default class PointEditView extends AbstractStatefulView {
 
   #offerCLickHandler = (evt) => {
     evt.preventDefault();
-console.log('work');
+
     const checkedBoxes = Array.from(this.element.querySelectorAll('.event__offer-checkbox:checked'));
-    console.log('checkedBoxes', checkedBoxes);
+
     this._setState({
       point: {
         ...this._state.point,
@@ -261,19 +271,18 @@ console.log('work');
 
   #priceInputChange = (evt) => {
     evt.preventDefault();
-console.log('price work');
+
     this._setState({
       point:{
         ...this._state.point,
-        basePrice: evt.target.valueAsNumber
+        basePrice: Number(evt.target.value)
       }
     });
-    console.log(this._state);
+
   };
 
   #destinationInputChange = (evt) => {
     evt.preventDefault();
-    console.log(this.#allDestinations);
 
     const selectedDestination = this.#allDestinations
       .find((pointDestination) => pointDestination.name === evt.target.value);
@@ -285,14 +294,21 @@ console.log('price work');
     this.updateElement({
       point: {
         ...this._state.point,
-        destination: selectedDestinationId
+        destination: selectedDestinationId,
       }
     });
   };
 
+  reset(point) {
+    this.updateElement(
+      PointEditView.parsePointToState(point),
+    );
+  }
+
   #resetClickHandler = (evt) => {
     evt.preventDefault();
     this.#onResetClick();
+
   };
 
   #submitClickHandler = (evt) => {
