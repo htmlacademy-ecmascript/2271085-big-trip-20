@@ -40,7 +40,7 @@ export default class PointsModel {
   }
 
   generateDestinations() {
-    return Array.from({length:DESTINATION_COUNT}, () => generateDestination()
+    return Array.from({length:DESTINATION_COUNT}, (_,index) => generateDestination(index)
     );
   }
 

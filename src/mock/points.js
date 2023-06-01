@@ -1,9 +1,9 @@
-import {getRandomArrayElement,getRandomInteger,filter} from '../utils.js';
+import {getRandomInteger,filter} from '../utils.js';
 import { CITIES, DESCRIPTION,BASE_PRICE,Duration} from '../const.js';
 import dayjs from 'dayjs';
 
-const generateDestination = () => {
-  const city = getRandomArrayElement(CITIES);
+const generateDestination = (index) => {
+  const city = CITIES[index];
 
   return {
     id: crypto.randomUUID(),

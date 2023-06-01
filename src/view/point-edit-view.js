@@ -2,10 +2,9 @@ import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import {POINT_EMPTY} from '../const.js';
 import {humanizeRenderEditPointDate} from '../utils.js';
 
-function createPointEditTemplate ({state, pointDestination, pointOffers,allDestinations}) {
+function createPointEditTemplate ({state,pointOffers,allDestinations}) {
 
   const {type, basePrice, dateFrom, dateTo, offers, destination} = state.point;
-  console.log('firstState.point', state.point);
 
   const startRenderEditPointDate = humanizeRenderEditPointDate(dateFrom);
   const endRenderEditPointDate = humanizeRenderEditPointDate(dateTo);
@@ -21,8 +20,8 @@ function createPointEditTemplate ({state, pointDestination, pointOffers,allDesti
   };
   const checkedOffers = generatePointEditOffers(type,pointOffers);
 
-  function getStateDestination(newdestination){
-    const data = allDestinations.find((punkt) => punkt.id === newdestination);
+  function getStateDestination(newDestination){
+    const data = allDestinations.find((punkt) => punkt.id === newDestination);
     return data;
   }
 
@@ -139,7 +138,7 @@ function createPointEditTemplate ({state, pointDestination, pointOffers,allDesti
 
         <section class="event__section  event__section--destination">
           <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-          <p class="event__destination-description">${pointDestination.description}</p>
+          <p class="event__destination-description">${stateDestination.description}</p>
 
           <div class="event__photos-container">
             <div class="event__photos-tape">
@@ -300,8 +299,9 @@ export default class PointEditView extends AbstractStatefulView {
   };
 
   reset(point) {
-    this.updateElement(
-      PointEditView.parsePointToState(point),
+    this.updateElement({
+      point: PointEditView.parsePointToState(point),
+    }
     );
   }
 
