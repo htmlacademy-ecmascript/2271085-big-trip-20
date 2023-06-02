@@ -103,8 +103,6 @@ export default class PointPresenter{
   };
 
   #handlerResetButtonClick = () =>{
-    // this.resetView();
-
     this.#pointEditComponent.reset(this.#point);
     this.#replaceFormToPoint();
     document.removeEventListener('keydown', this.#escKeyDownHandler);
