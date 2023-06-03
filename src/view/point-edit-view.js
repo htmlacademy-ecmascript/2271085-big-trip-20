@@ -187,8 +187,7 @@ export default class PointEditView extends AbstractStatefulView {
       .addEventListener('click', this.#resetClickHandler);
 
     this.element
-      .querySelector('.event__save-btn')
-      .addEventListener('click',this.#submitClickHandler);
+      .addEventListener('submit', this.#formSubmitHandler);
 
     this.element
       .querySelector('.event__type-group')
@@ -278,7 +277,8 @@ export default class PointEditView extends AbstractStatefulView {
 
   };
 
-  #submitClickHandler = (evt) => {
+
+  #formSubmitHandler = (evt) => {
     evt.preventDefault();
     this.#onSubmitClick(PointEditView.parseStateToPoint(this._state));
   };
