@@ -1,9 +1,9 @@
-import {getRandomArrayElement,getRandomInteger,filter} from '../utils.js';
+import {getRandomInteger,filter} from '../utils.js';
 import { CITIES, DESCRIPTION,BASE_PRICE,Duration} from '../const.js';
 import dayjs from 'dayjs';
 
-const generateDestination = () => {
-  const city = getRandomArrayElement(CITIES);
+const generateDestination = (index) => {
+  const city = CITIES[index];
 
   return {
     id: crypto.randomUUID(),
@@ -17,6 +17,20 @@ const generateDestination = () => {
     ]
   };
 };
+
+const generateCityDestination = (city) =>
+  ({
+    id: crypto.randomUUID(),
+    name: city,
+    description: DESCRIPTION,
+    pictures: [
+      {
+        'src': `https://loremflickr.com/248/152?random=${crypto.randomUUID()}`,
+        'description': `${city} description`
+      }
+    ]
+  });
+
 
 const generateOffer = (type) => ({
   id: crypto.randomUUID(),
@@ -63,4 +77,4 @@ function generateFilters(points){
     }));
 }
 
-export {generatePoint,generateDestination,generateOffer,generateFilters};
+export {generatePoint,generateDestination,generateCityDestination,generateOffer,generateFilters};

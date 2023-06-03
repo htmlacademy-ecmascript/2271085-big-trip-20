@@ -1,6 +1,6 @@
-import {POINT_COUNT,DESTINATION_COUNT,OFFER_COUNT,WAYPOINT_TYPES} from '../const.js';
+import {POINT_COUNT,DESTINATION_COUNT,OFFER_COUNT,WAYPOINT_TYPES, CITIES} from '../const.js';
 import {getRandomArrayElement, getRandomInteger} from '../utils.js';
-import {generatePoint,generateDestination,generateOffer} from '../mock/points.js';
+import {generatePoint,generateDestination,generateCityDestination,generateOffer} from '../mock/points.js';
 
 export default class PointsModel {
   #destinations = [];
@@ -15,6 +15,10 @@ export default class PointsModel {
 
   get points(){
     return this.#points;
+  }
+
+  get allCities(){
+    return CITIES.map((city) => generateCityDestination(city));
   }
 
   get destinations(){
@@ -36,7 +40,7 @@ export default class PointsModel {
   }
 
   generateDestinations() {
-    return Array.from({length:DESTINATION_COUNT}, () => generateDestination()
+    return Array.from({length:DESTINATION_COUNT}, (_,index) => generateDestination(index)
     );
   }
 

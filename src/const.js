@@ -1,7 +1,7 @@
 const WAYPOINT_TYPES = [ 'taxi','bus','train','ship','drive','flight','check-in','sightseeing','restaurant'];
 const POINT_COUNT = 5;
-const DESTINATION_COUNT = 5;
-const OFFER_COUNT = 3;
+
+const OFFER_COUNT = 5;
 const DEFAULT_TYPE = 'flight';
 const POINT_EMPTY = {
   basePrice: 0,
@@ -14,6 +14,7 @@ const POINT_EMPTY = {
 };
 
 const CITIES = ['Berlin', 'Minsk', 'Moscow', 'Amsterdam', 'Tokio', 'Oslo', 'Gomel', 'Helsinki', 'New-York', 'Geneva'];
+const DESTINATION_COUNT = CITIES.length;
 const DESCRIPTION = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras aliquet varius magna, non porta ligula feugiat eget. Fusce tristique felis at fermentum pharetra. Aliquam id orci ut lectus varius viverra. Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante.';
 const BASE_PRICE = {
   MIN: 1,
