@@ -302,18 +302,27 @@ export default class PointEditView extends AbstractStatefulView {
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
     this.#onSubmitClick(PointEditView.parseStateToPoint(this._state));
+
   };
 
   #startChangeHandler = ([userDate]) => {
-    this.updateElement({
-      dateFrom: userDate,
+    this._setState({
+      point:{
+        ...this._state.point,
+        dateFrom:userDate
+      }
     });
+    this.#startDatepicker.set('minDate', this._state.point.dateFrom);
   };
 
   #finishChangeHandler = ([userDate]) => {
-    this.updateElement({
-      dateTo: userDate,
+    this._setState({
+      point:{
+        ...this._state.point,
+        dateTo:userDate
+      }
     });
+    this.#finishDatepicker.set('maxDate', this._state.point.dateTo);
   };
 
   #setDatepickerStart(){
@@ -324,6 +333,7 @@ export default class PointEditView extends AbstractStatefulView {
         enableTime: true,
         dateFormat: 'd/m/y H:i',
         defaultDate: this._state.dateFrom,
+        maxDate: this._state.dateTo,
         onChange: this.#startChangeHandler,
       }
     );
@@ -338,6 +348,7 @@ export default class PointEditView extends AbstractStatefulView {
         enableTime: true,
         dateFormat: 'd/m/y H:i',
         defaultDate: this._state.dateTo,
+        minDate: this._state.dateFrom,
         onChange: this.#finishChangeHandler,
       }
     );
