@@ -41,4 +41,21 @@ const SortType = {
   OFFERS: 'offers'
 };
 
-export {FilterType, SortType,POINT_COUNT, OFFER_COUNT,WAYPOINT_TYPES, POINT_EMPTY, CITIES, DESCRIPTION,BASE_PRICE,DESTINATION_COUNT,Duration};
+const UserAction = {
+  UPDATE_POINT: 'UPDATE_POINT',
+  ADD_POINT: 'ADD_POINT',
+  DELETE_POINT: 'DELETE_POINT',
+};
+
+const UpdateType = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR',
+};
+
+export {FilterType,UserAction,UpdateType,
+  SortType,POINT_COUNT,
+  OFFER_COUNT,WAYPOINT_TYPES,
+  POINT_EMPTY, CITIES, DESCRIPTION,
+  BASE_PRICE,DESTINATION_COUNT,
+  Duration};
