@@ -64,7 +64,7 @@ export default class NewPointPresenter {
 
   #handlerPointSubmit = (update) => {
     this.#handleDataChange(
-      UserAction.UPDATE_POINT,
+      UserAction.ADD_POINT,
       UpdateType.MINOR,
       {id:crypto.randomUUID(), ...update}
     );

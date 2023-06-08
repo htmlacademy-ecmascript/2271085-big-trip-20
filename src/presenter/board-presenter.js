@@ -57,7 +57,7 @@ export default class BoardPresenter {
         this.#pointsModel.updatePoint(updateType,update);
         break;
       case UserAction.ADD_POINT:
-        this.#pointsModel.addPont(updateType,update);
+        this.#pointsModel.addPoint(updateType,update);
         break;
       case UserAction.DELETE_POINT:
         this.#pointsModel.deletePoint(updateType,update);
