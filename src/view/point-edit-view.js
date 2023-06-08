@@ -1,11 +1,17 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
-import {POINT_EMPTY,WAYPOINT_TYPES} from '../const.js';
+import {POINT_EMPTY,WAYPOINT_TYPES, EditType} from '../const.js';
 import {humanizeRenderEditPointDate} from '../utils.js';
 
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 
-function createPointEditTemplate ({state,pointOffers,allDestinations}) {
+const ButtonLabel = {
+  [EditType.EDITING]: 'Delete',
+  [EditType.CREATING]: 'Cancel'
+};
+
+
+function createPointEditTemplate ({state,pointOffers,allDestinations,formType}) {
 
   const {type, basePrice, dateFrom, dateTo, offers, destination} = state;
 
@@ -28,14 +34,16 @@ function createPointEditTemplate ({state,pointOffers,allDestinations}) {
     return data;
   }
 
-  const stateDestination = getStateDestination(destination);
-
   function getPhotosSRC(destin){
 
-    const data = destin.pictures.map((pictureObject) => pictureObject.src);
+    const data = destin.pictures.map((picture) => (`<img class="event__photo" src="${picture.src}" alt="Event photo">`
+    )).join('');
     return data;
   }
-  const photosSRC = getPhotosSRC(stateDestination);
+  // const stateDestination = getStateDestination(destination);
+  // console.log('stateDestination', stateDestination);
+  // const photosSRC = getPhotosSRC(stateDestination);
+  // console.log('src', photosSRC);
 
   return (
     `<li class="trip-events__item">
@@ -60,7 +68,7 @@ function createPointEditTemplate ({state,pointOffers,allDestinations}) {
           <label class="event__label  event__type-output" for="event-destination-1">
             ${type}
           </label>
-          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value=${stateDestination.name} list="destination-list-1">
+          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination ? getStateDestination(destination).name : ''}" list="destination-list-1">
           <datalist id="destination-list-1">
           ${createDestinationsList(allDestinations)}
           </datalist>
@@ -82,8 +90,7 @@ function createPointEditTemplate ({state,pointOffers,allDestinations}) {
           <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value=${basePrice}>
         </div>
 
-        <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-        <button class="event__reset-btn" type="reset">Cancel</button>
+        ${createPointEditControlsTemplate({formType})}
       </header>
       <section class="event__details">
         <section class="event__section  event__section--offers">
@@ -97,11 +104,11 @@ function createPointEditTemplate ({state,pointOffers,allDestinations}) {
 
         <section class="event__section  event__section--destination">
           <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-          <p class="event__destination-description">${stateDestination.description}</p>
+          <p class="event__destination-description">${ destination ? getStateDestination(destination).description : ''}</p>
 
           <div class="event__photos-container">
             <div class="event__photos-tape">
-            ${createPhotosDestinationsTemplate(photosSRC)}
+            ${ destination ? getPhotosSRC(getStateDestination(destination)) : ''}
             </div>
           </div>
         </section>
@@ -109,6 +116,22 @@ function createPointEditTemplate ({state,pointOffers,allDestinations}) {
     </form>
   </li>`
   );
+}
+
+function createDeleteButtonTemplate({formType}) {
+  return `<button class="event__reset-btn" type="reset">${ButtonLabel[formType]}</button>`;
+}
+
+function createRollupButtonTemplate() {
+  return '<button class="event__rollup-btn" type="button"><span class="visually-hidden">Open event</span></button>';
+}
+
+function createPointEditControlsTemplate({formType}) {
+  return`
+    <button class="event__save-btn btn btn--blue" type="submit">Save</button>
+    ${createDeleteButtonTemplate({formType})}
+    ${(formType !== EditType.CREATING) ? createRollupButtonTemplate() : ''}
+  `;
 }
 
 function createPointType (wayTypes,type) {
@@ -124,15 +147,6 @@ function createPointType (wayTypes,type) {
 function createDestinationsList (allDestinations){
   return allDestinations.map((destination) =>`
   <option value="${destination.name}"></option>`).join('');
-}
-
-function createPhotosDestinationsTemplate(srcs){
-  const data = srcs.map((photo) =>
-    (
-      `<img class="event__photo" src=${photo} alt="Event photo">`
-    )
-  );
-  return data;
 }
 
 function createPointEditOffersTemplate (pointOffers,type,checkedOffers){
@@ -160,15 +174,19 @@ export default class PointEditView extends AbstractStatefulView {
   #allDestinations = null;
   #startDatepicker = null;
   #finishDatepicker = null;
+  #onDeleteClick = null;
+  #formType = null;
 
 
-  constructor({point = POINT_EMPTY, pointDestination, pointOffers, onResetClick, onSubmitClick,allDestinations}) {
+  constructor({point = POINT_EMPTY, pointDestination, pointOffers, onDeleteClick, onResetClick, onSubmitClick,allDestinations, formType = EditType.EDITING}) {
     super();
     this.#destination = pointDestination;
     this.#pointOffers = pointOffers;
     this.#onResetClick = onResetClick;
     this.#onSubmitClick = onSubmitClick;
     this.#allDestinations = allDestinations;
+    this.#onDeleteClick = onDeleteClick;
+    this.#formType = formType;
 
 
     this._setState(PointEditView.parsePointToState(point));
@@ -181,7 +199,8 @@ export default class PointEditView extends AbstractStatefulView {
       state : this._state,
       pointDestination : this.#destination,
       pointOffers : this.#pointOffers,
-      allDestinations: this.#allDestinations
+      allDestinations: this.#allDestinations,
+      formType: this.#formType
     });
   }
 
@@ -199,9 +218,22 @@ export default class PointEditView extends AbstractStatefulView {
   }
 
   _restoreHandlers() {
-    this.element
-      .querySelector('.event__reset-btn')
-      .addEventListener('click', this.#resetClickHandler);
+
+    if(this.#formType === EditType.EDITING){
+      this.element
+        .querySelector('.event__rollup-btn')
+        .addEventListener('click', this.#rollupButtonClickHandler);
+
+      this.element
+        .querySelector('.event__reset-btn')
+        .addEventListener('click', this.#deleteClickHandler);
+    }
+
+    if (this.#formType === EditType.CREATING){
+      this.element
+        .querySelector('.event__reset-btn')
+        .addEventListener('click', this.#resetClickHandler);
+    }
 
     this.element
       .addEventListener('submit', this.#formSubmitHandler);
@@ -281,6 +313,16 @@ export default class PointEditView extends AbstractStatefulView {
     evt.preventDefault();
     this.#onResetClick();
 
+  };
+
+  #deleteClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#onDeleteClick(PointEditView.parseStateToPoint(this._state));
+  };
+
+  #rollupButtonClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#onResetClick();
   };
 
 

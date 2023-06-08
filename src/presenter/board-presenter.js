@@ -1,9 +1,10 @@
 import { remove, render,RenderPosition } from '../framework/render.js';
-import {updateItem, sortPointByTime, sortPointByPrice,sortPointByDay} from '../utils.js';
+import {sortPointByTime, sortPointByPrice} from '../utils.js';
 import EventListView from '../view/event-list-view';
 import SortView from '../view/sort-view';
 import EmptyView from '../view/empty-view.js';
 import PointPresenter from './point-presenter.js';
+import NewPointPresenter from './new-point-presenter.js';
 import { SortType,UserAction, UpdateType } from '../const.js';
 
 export default class BoardPresenter {
@@ -11,6 +12,9 @@ export default class BoardPresenter {
   #pointsModel = null;
 
   #pointPresenters = new Map();
+  #newEventPresenter = null;
+  #isCreating = false;
+  #newEventElement = document.querySelector('.trip-main__event-add-btn');
   #currentSortType = SortType.DAY;
   #sortComponent = null;
   #eventListComponent = new EventListView();
@@ -21,6 +25,15 @@ export default class BoardPresenter {
     this.#pointsModel = pointsModel;
 
     this.#pointsModel.addObserver(this.#handleModelEvent);
+
+    this.#newEventElement.addEventListener('click',this.#onNewEventClick);
+
+    this.#newEventPresenter = new NewPointPresenter({
+      container: this.#eventListComponent.element,
+      pointsModel: this.#pointsModel,
+      onDataChange: this.#handleViewAction,
+      onPointDestroy: this.#handleNewPointFormClose,
+    });
   }
 
   get points(){
@@ -38,7 +51,7 @@ export default class BoardPresenter {
     this.#renderBoard();
   }
 
-  #handleViewAction = (actionType, updateType, update) => {//заглушка
+  #handleViewAction = (actionType, updateType, update) => {
     switch (actionType){
       case UserAction.UPDATE_POINT:
         this.#pointsModel.updatePoint(updateType,update);
@@ -52,17 +65,17 @@ export default class BoardPresenter {
     }
   };
 
-  #handleModelEvent = (updateType, data) => { //заглушка
+  #handleModelEvent = (updateType, data) => {
     switch (updateType){
       case UpdateType.PATCH:
         this.#pointPresenters.get(data.id).init(data);
         break;
       case UpdateType.MINOR:
-        this.#clearPoints();
+        this.#clearBoard();
         this.#renderBoard();
         break;
       case UpdateType.MAJOR:
-        this.#clearPoints({resetSortType : true});
+        this.#clearBoard({resetSortType : true});
         this.#renderBoard();
         break;
     }
@@ -73,13 +86,14 @@ export default class BoardPresenter {
       return;
     }
     this.#currentSortType = sortType;
-    this.#clearPoints();
+    this.#clearBoard();
     this.#renderBoard();
   };
 
   #renderSort() {
     this.#sortComponent = new SortView({
       sorts: Object.values(SortType),
+      currentSortType : this.#currentSortType,
       onSortTypeChange: this.#handleSortTypeChange
     });
     if (this.points.length !== 0){
@@ -97,7 +111,7 @@ export default class BoardPresenter {
     for(let i = 0; i < this.points.length; i ++){
       this.#renderPoint(this.points[i]);
     }
-    if(this.points.length === 0){
+    if(this.points.length === 0 && !this.#isCreating){
       this.#renderEmptyList();
     }
 
@@ -115,7 +129,8 @@ export default class BoardPresenter {
     this.#pointPresenters.set(point.id, pointPresenter);
   }
 
-  #clearPoints({resetSortType = false} = {}) { // ???
+  #clearBoard({resetSortType = false} = {}) {
+    this.#newEventPresenter.destroy();
     this.#pointPresenters.forEach((presenter) => presenter.destroy());
     this.#pointPresenters.clear();
     remove(this.#sortComponent);
@@ -126,8 +141,27 @@ export default class BoardPresenter {
   }
 
   #handleModeChange = () => {
+    this.#newEventPresenter.destroy();
     this.#pointPresenters.forEach((presenter) => presenter.resetView());
   };
 
+  #onNewEventClick = () => {
+    this.#isCreating = true;
+    this.#newEventElement.disabled = true;
+    this.#createPoint();
+  };
 
+  #createPoint () {
+    this.#currentSortType = SortType.DAY;
+    this.#newEventPresenter.init();
+  }
+
+  #handleNewPointFormClose = () => {
+    this.#isCreating = false;
+    this.#newEventElement.disabled = false;
+    if (!this.points.length && !this.#isCreating) {
+      remove(this.#sortComponent);
+      this.#renderEmptyList();
+    }
+  };
 }

@@ -4,10 +4,10 @@ const POINT_COUNT = 5;
 const OFFER_COUNT = 5;
 const DEFAULT_TYPE = 'flight';
 const POINT_EMPTY = {
-  basePrice: 0,
-  dateFrom: null,
-  dateTo: null,
-  destination: null,
+  basePrice: '',
+  dateFrom: new Date(),
+  dateTo: new Date(),
+  destination: '',
   isFavorite: false,
   offers: [],
   type: DEFAULT_TYPE
@@ -53,8 +53,13 @@ const UpdateType = {
   MAJOR: 'MAJOR',
 };
 
+const EditType = {
+  EDITING: 'EDITING',
+  CREATING: 'CREATING'
+};
+
 export {FilterType,UserAction,UpdateType,
-  SortType,POINT_COUNT,
+  SortType,EditType,POINT_COUNT,
   OFFER_COUNT,WAYPOINT_TYPES,
   POINT_EMPTY, CITIES, DESCRIPTION,
   BASE_PRICE,DESTINATION_COUNT,
