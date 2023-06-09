@@ -1,4 +1,3 @@
-import he from 'he';
 import { remove, render,RenderPosition } from '../framework/render.js';
 import {sortPointByTime, sortPointByPrice, filter} from '../utils.js';
 import EventListView from '../view/event-list-view';
@@ -110,7 +109,7 @@ export default class BoardPresenter {
   }
 
   #renderMessage(){
-    this.#emptyViewComponent = new EmptyView({filterType: this.#filterType})
+    this.#emptyViewComponent = new EmptyView({filterType: this.#filterType});
     render(this.#emptyViewComponent, this.#eventListComponent.element, RenderPosition.AFTERBEGIN);
   }
 
