@@ -58,7 +58,14 @@ const EditType = {
   CREATING: 'CREATING'
 };
 
-export {FilterType,UserAction,UpdateType,
+const FilterTypeMessage = {
+  EVERYTHING: 'Click New Event to create your first point',
+  FUTURE: 'There are no future events now',
+  PRESENT: 'There are no present events now',
+  PAST: 'There are no past events now',
+};
+
+export {FilterType,FilterTypeMessage,UserAction,UpdateType,
   SortType,EditType,POINT_COUNT,
   OFFER_COUNT,WAYPOINT_TYPES,
   POINT_EMPTY, CITIES, DESCRIPTION,

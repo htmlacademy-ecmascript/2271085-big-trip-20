@@ -1,32 +1,36 @@
 import { remove, render,RenderPosition } from '../framework/render.js';
-import {sortPointByTime, sortPointByPrice} from '../utils.js';
+import {sortPointByTime, sortPointByPrice, filter} from '../utils.js';
 import EventListView from '../view/event-list-view';
 import SortView from '../view/sort-view';
 import EmptyView from '../view/empty-view.js';
 import PointPresenter from './point-presenter.js';
 import NewPointPresenter from './new-point-presenter.js';
-import { SortType,UserAction, UpdateType } from '../const.js';
+import { SortType,UserAction, UpdateType, FilterType } from '../const.js';
 
 export default class BoardPresenter {
   #container = null;
   #pointsModel = null;
+  #filterModel = null;
 
   #pointPresenters = new Map();
   #newEventPresenter = null;
   #isCreating = false;
-  #newEventElement = document.querySelector('.trip-main__event-add-btn');
+  #newEventButton = document.querySelector('.trip-main__event-add-btn');
   #currentSortType = SortType.DAY;
   #sortComponent = null;
   #eventListComponent = new EventListView();
-  #emptyViewComponent = new EmptyView();
+  #emptyViewComponent = null;
+  #filterType = FilterType.EVERYTHING;
 
-  constructor({container, pointsModel}) {
+  constructor({container, pointsModel, filterModel}) {
     this.#container = container;
     this.#pointsModel = pointsModel;
+    this.#filterModel = filterModel;
 
     this.#pointsModel.addObserver(this.#handleModelEvent);
+    this.#filterModel.addObserver(this.#handleModelEvent);
 
-    this.#newEventElement.addEventListener('click',this.#onNewEventClick);
+    this.#newEventButton.addEventListener('click',this.#onNewEventClick);
 
     this.#newEventPresenter = new NewPointPresenter({
       container: this.#eventListComponent.element,
@@ -37,13 +41,16 @@ export default class BoardPresenter {
   }
 
   get points(){
+    this.#filterType = this.#filterModel.filter;
+    const points = this.#pointsModel.points;
+    const filteredPoints = filter[this.#filterType](points);
     switch(this.#currentSortType){
       case SortType.TIME:
-        return [...this.#pointsModel.points].sort(sortPointByTime);
+        return filteredPoints.sort(sortPointByTime);
       case SortType.PRICE:
-        return [...this.#pointsModel.points].sort(sortPointByPrice);
+        return filteredPoints.sort(sortPointByPrice);
     }
-    return this.#pointsModel.points;
+    return filteredPoints;
   }
 
 
@@ -101,20 +108,22 @@ export default class BoardPresenter {
     }
   }
 
-  #renderEmptyList(){
+  #renderMessage(){
+    this.#emptyViewComponent = new EmptyView({filterType: this.#filterType})
     render(this.#emptyViewComponent, this.#eventListComponent.element, RenderPosition.AFTERBEGIN);
   }
 
   #renderBoard() {
     render(this.#eventListComponent, this.#container);
+    if(this.points.length === 0 && !this.#isCreating){
+      this.#renderMessage();
+      return;
+    }
+
     this.#renderSort();
     for(let i = 0; i < this.points.length; i ++){
       this.#renderPoint(this.points[i]);
     }
-    if(this.points.length === 0 && !this.#isCreating){
-      this.#renderEmptyList();
-    }
-
   }
 
 
@@ -147,7 +156,8 @@ export default class BoardPresenter {
 
   #onNewEventClick = () => {
     this.#isCreating = true;
-    this.#newEventElement.disabled = true;
+    this.#newEventButton.disabled = true;
+    remove(this.#emptyViewComponent);
     this.#createPoint();
   };
 
@@ -158,10 +168,10 @@ export default class BoardPresenter {
 
   #handleNewPointFormClose = () => {
     this.#isCreating = false;
-    this.#newEventElement.disabled = false;
+    this.#newEventButton.disabled = false;
     if (!this.points.length && !this.#isCreating) {
       remove(this.#sortComponent);
-      this.#renderEmptyList();
+      this.#renderMessage();
     }
   };
 }
