@@ -4,7 +4,7 @@ const POINT_COUNT = 5;
 const OFFER_COUNT = 5;
 const DEFAULT_TYPE = 'flight';
 const POINT_EMPTY = {
-  basePrice: '',
+  basePrice: 0,
   dateFrom: new Date(),
   dateTo: new Date(),
   destination: '',

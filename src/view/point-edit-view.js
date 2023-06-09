@@ -1,3 +1,4 @@
+import he from 'he';
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import {POINT_EMPTY,WAYPOINT_TYPES, EditType} from '../const.js';
 import {humanizeRenderEditPointDate} from '../utils.js';
@@ -40,10 +41,6 @@ function createPointEditTemplate ({state,pointOffers,allDestinations,formType}) 
     )).join('');
     return data;
   }
-  // const stateDestination = getStateDestination(destination);
-  // console.log('stateDestination', stateDestination);
-  // const photosSRC = getPhotosSRC(stateDestination);
-  // console.log('src', photosSRC);
 
   return (
     `<li class="trip-events__item">
@@ -68,7 +65,7 @@ function createPointEditTemplate ({state,pointOffers,allDestinations,formType}) 
           <label class="event__label  event__type-output" for="event-destination-1">
             ${type}
           </label>
-          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination ? getStateDestination(destination).name : ''}" list="destination-list-1">
+          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(destination ? getStateDestination(destination).name : '')}" list="destination-list-1">
           <datalist id="destination-list-1">
           ${createDestinationsList(allDestinations)}
           </datalist>
@@ -76,10 +73,10 @@ function createPointEditTemplate ({state,pointOffers,allDestinations,formType}) 
 
         <div class="event__field-group  event__field-group--time">
           <label class="visually-hidden" for="event-start-time-1">From</label>
-          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${startRenderEditPointDate}">
+          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${he.encode(startRenderEditPointDate)}">
           &mdash;
           <label class="visually-hidden" for="event-end-time-1">To</label>
-          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${endRenderEditPointDate}">
+          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${he.encode(endRenderEditPointDate)}">
         </div>
 
         <div class="event__field-group  event__field-group--price">
@@ -87,7 +84,7 @@ function createPointEditTemplate ({state,pointOffers,allDestinations,formType}) 
             <span class="visually-hidden">Price</span>
             &euro;
           </label>
-          <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value=${basePrice}>
+          <input class="event__input  event__input--price" id="event-price-1" type="number" min="0" name="event-price" value=${basePrice}>
         </div>
 
         ${createPointEditControlsTemplate({formType})}
@@ -295,13 +292,18 @@ export default class PointEditView extends AbstractStatefulView {
     const selectedDestination = this.#allDestinations
       .find((pointDestination) => pointDestination.name === evt.target.value);
 
-    const selectedDestinationId = (selectedDestination)
-      ? selectedDestination.id
-      : this._state.point.destination;
 
-    this.updateElement({
-      destination: selectedDestinationId,
-    });
+    if(selectedDestination){
+      const selectedDestinationId = (selectedDestination)
+        ? selectedDestination.id
+        : this._state.point.destination;
+
+      this.updateElement({
+        destination: selectedDestinationId,
+      });
+    } else{
+      evt.target.value = '';
+    }
   };
 
   reset(point) {
