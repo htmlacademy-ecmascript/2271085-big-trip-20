@@ -68,7 +68,7 @@ export default class NewPointPresenter {
     }
     this.#handleDataChange(
       UserAction.ADD_POINT,
-      UpdateType.MAJOR,//////////////////////////MINOR
+      UpdateType.MINOR,
       {id:crypto.randomUUID(), ...update}
     );
     this.destroy();
