@@ -254,8 +254,9 @@ export default class PointEditView extends AbstractStatefulView {
       offerBlock.addEventListener('change', this.#offerCLickHandler);
     }
 
-    this.#setDatepickerStart();
-    this.#setDatepickerFinish();
+    // this.#setDatepickerStart();
+    // this.#setDatepickerFinish();
+    this.#setDatePicker();
   }
 
   #typeInputClick = (evt) => {
@@ -330,42 +331,48 @@ export default class PointEditView extends AbstractStatefulView {
 
   };
 
-  #startChangeHandler = ([userDate]) => {
-    this._setState({
-      dateFrom:userDate
+  #startDateChangeHandler = ([dateFrom]) => {
+    this.updateElement({
+      dateFrom: dateFrom,
     });
   };
 
-  #finishChangeHandler = ([userDate]) => {
-    this._setState({
-      dateTo:userDate
+  #endDateChangeHandler = ([dateTo]) => {
+    this.updateElement({
+      dateTo: dateTo,
     });
   };
 
-  #setDatepickerStart(){
-    this.#startDatepicker = flatpickr(
-      this.element.querySelector('#event-start-time-1'),
+
+  #setDatePicker () {
+    const startDate = this.element.querySelector('#event-start-time-1');
+    const endDate = this.element.querySelector('#event-end-time-1');
+
+    flatpickr(
+      startDate,
       {
         enableTime: true,
-        dateFormat: 'd/m/y H:i',
         'time_24hr': true,
-        defaultDate: this._state.dateFrom,
+        dateFormat: 'd/m/y H:i',
         maxDate: this._state.dateTo,
-        onChange: this.#startChangeHandler,
+        locale: {
+          firstDayOfWeek: 1
+        },
+        onChange: this.#startDateChangeHandler,
       }
     );
-  }
 
-  #setDatepickerFinish(){
-    this.#finishDatepicker = flatpickr(
-      this.element.querySelector('#event-end-time-1'),
+    flatpickr(
+      endDate,
       {
         enableTime: true,
-        dateFormat: 'd/m/y H:i',
         'time_24hr': true,
-        defaultDate: this._state.dateTo,
+        dateFormat: 'd/m/y H:i',
         minDate: this._state.dateFrom,
-        onChange: this.#finishChangeHandler,
+        locale: {
+          firstDayOfWeek: 1
+        },
+        onChange: this.#endDateChangeHandler,
       }
     );
   }
