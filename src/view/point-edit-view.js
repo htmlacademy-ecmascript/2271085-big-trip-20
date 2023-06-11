@@ -293,17 +293,13 @@ export default class PointEditView extends AbstractStatefulView {
       .find((pointDestination) => pointDestination.name === evt.target.value);
 
 
-    if(selectedDestination){
-      const selectedDestinationId = (selectedDestination)
-        ? selectedDestination.id
-        : this._state.point.destination;
+    const selectedDestinationId = (selectedDestination)
+      ? selectedDestination.id
+      : '';
 
-      this.updateElement({
-        destination: selectedDestinationId,
-      });
-    } else{
-      evt.target.value = '';
-    }
+    this.updateElement({
+      destination: selectedDestinationId,
+    });
   };
 
   reset(point) {

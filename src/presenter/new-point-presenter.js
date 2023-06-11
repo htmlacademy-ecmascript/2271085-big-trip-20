@@ -36,7 +36,7 @@ export default class NewPointPresenter {
     });
 
     render(this.#pointNewComponent, this.#container, RenderPosition.AFTERBEGIN);
-    document.addEventListener('keydown', this.escKeyDownHandler);
+    document.addEventListener('keydown', this.#escKeyDownHandler);
   }
 
   destroy () {
@@ -63,9 +63,12 @@ export default class NewPointPresenter {
   };
 
   #handlerPointSubmit = (update) => {
+    if (!update.destination){
+      return;
+    }
     this.#handleDataChange(
       UserAction.ADD_POINT,
-      UpdateType.MINOR,
+      UpdateType.MAJOR,//////////////////////////MINOR
       {id:crypto.randomUUID(), ...update}
     );
     this.destroy();

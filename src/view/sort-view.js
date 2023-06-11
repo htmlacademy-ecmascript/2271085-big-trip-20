@@ -25,7 +25,7 @@ export default class SortView extends AbstractView {
     this.#sorts = sorts;
 
     this.element
-      .addEventListener('change', this.#sortTypeChangeHandler);
+      .addEventListener('click', this.#sortTypeChangeHandler);
   }
 
   get template() {

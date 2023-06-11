@@ -84,9 +84,6 @@ const sortPointByPrice = (pointA, pointB) => pointB.basePrice - pointA.basePrice
 
 const sortPointByDay = (pointA, pointB) =>dayjs(pointA.dateFrom) - dayjs(pointB.dateFrom);
 
-// function updateItem(items, update) {
-//   return items.map((item) => item.id === update.id ? update : item);
-// }
 
 export {getRandomInteger,
   getRandomArrayElement,

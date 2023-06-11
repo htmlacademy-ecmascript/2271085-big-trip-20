@@ -1,5 +1,5 @@
 import { remove, render,RenderPosition } from '../framework/render.js';
-import {sortPointByTime, sortPointByPrice, filter} from '../utils.js';
+import {sortPointByTime, sortPointByPrice, sortPointByDay, filter} from '../utils.js';
 import EventListView from '../view/event-list-view';
 import SortView from '../view/sort-view';
 import EmptyView from '../view/empty-view.js';
@@ -50,7 +50,7 @@ export default class BoardPresenter {
       case SortType.PRICE:
         return filteredPoints.sort(sortPointByPrice);
     }
-    return filteredPoints;
+    return filteredPoints.sort(sortPointByDay);
   }
 
 
@@ -104,7 +104,7 @@ export default class BoardPresenter {
       onSortTypeChange: this.#handleSortTypeChange
     });
     if (this.points.length !== 0){
-      render(this.#sortComponent, this.#eventListComponent.element,RenderPosition.AFTERBEGIN);
+      render(this.#sortComponent, this.#eventListComponent.element,RenderPosition.BEFOREBEGIN);
     }
   }
 
@@ -163,6 +163,7 @@ export default class BoardPresenter {
 
   #createPoint () {
     this.#currentSortType = SortType.DAY;
+    this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
     this.#newEventPresenter.init();
   }
 
