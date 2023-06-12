@@ -90,6 +90,7 @@ export default class BoardPresenter {
         break;
       case UpdateType.INIT:
         this.#isLoading = false;
+        this.#newEventButton.disabled = false;
         remove(this.#loadingComponent);
         this.#renderBoard();
         break;
@@ -126,6 +127,7 @@ export default class BoardPresenter {
 
     if(this.#isLoading){
       this.#renderLoading();
+      this.#newEventButton.disabled = true;
       return;
     }
 

@@ -13,17 +13,6 @@ function capitalize(string){
   return `${string[0].toUpperCase()}${string.slice(1)}`;
 }
 
-function getRandomInteger (a = 0, b = 1){
-  const lower = Math.ceil(Math.min(a, b));
-  const upper = Math.floor(Math.max(a, b));
-
-  return Math.floor(lower + Math.random() * (upper - lower + 1));
-}
-
-function getRandomArrayElement(items) {
-  return items[getRandomInteger(0, items.length - 1)];
-}
-
 function humanizeRenderEditPointDate(date) {
   return date ? dayjs(date).format(POINT_EDIT_FORMAT) : '';
 }
@@ -85,8 +74,7 @@ const sortPointByPrice = (pointA, pointB) => pointB.basePrice - pointA.basePrice
 const sortPointByDay = (pointA, pointB) =>dayjs(pointA.dateFrom) - dayjs(pointB.dateFrom);
 
 
-export {getRandomInteger,
-  getRandomArrayElement,
+export {
   filter,
   sortPointByTime,
   sortPointByPrice,
@@ -97,5 +85,4 @@ export {getRandomInteger,
   humanizeAttributePointDate,
   humanizeAttributePointTime,
   humanizeRenderPointTime,calculateDuration,
-  // updateItem
 };
