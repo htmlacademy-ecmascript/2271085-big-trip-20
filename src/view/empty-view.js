@@ -1,8 +1,23 @@
 import AbstractView from '../framework/view/abstract-view.js';
-const createEmptyTemplate = () => '<p class="trip-events__msg">Click New Event to create your first point</p>';
+import { FilterTypeMessage } from '../const.js';
+
+
+const createEmptyTemplate = (activeFilter) => {
+  const emptyMessage = FilterTypeMessage[activeFilter];
+  return`
+  <p class="trip-events__msg">${emptyMessage}</p>`;
+};
 
 export default class EmptyView extends AbstractView{
+
+  #activeFilter = null;
+
+  constructor({ filterType }) {
+    super();
+    this.#activeFilter = filterType;
+  }
+
   get template(){
-    return createEmptyTemplate();
+    return createEmptyTemplate(this.#activeFilter.toUpperCase());
   }
 }

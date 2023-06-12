@@ -5,9 +5,9 @@ const OFFER_COUNT = 5;
 const DEFAULT_TYPE = 'flight';
 const POINT_EMPTY = {
   basePrice: 0,
-  dateFrom: null,
-  dateTo: null,
-  destination: null,
+  dateFrom: new Date(),
+  dateTo: new Date(),
+  destination: '',
   isFavorite: false,
   offers: [],
   type: DEFAULT_TYPE
@@ -41,4 +41,33 @@ const SortType = {
   OFFERS: 'offers'
 };
 
-export {FilterType, SortType,POINT_COUNT, OFFER_COUNT,WAYPOINT_TYPES, POINT_EMPTY, CITIES, DESCRIPTION,BASE_PRICE,DESTINATION_COUNT,Duration};
+const UserAction = {
+  UPDATE_POINT: 'UPDATE_POINT',
+  ADD_POINT: 'ADD_POINT',
+  DELETE_POINT: 'DELETE_POINT',
+};
+
+const UpdateType = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR',
+};
+
+const EditType = {
+  EDITING: 'EDITING',
+  CREATING: 'CREATING'
+};
+
+const FilterTypeMessage = {
+  EVERYTHING: 'Click New Event to create your first point',
+  FUTURE: 'There are no future events now',
+  PRESENT: 'There are no present events now',
+  PAST: 'There are no past events now',
+};
+
+export {FilterType,FilterTypeMessage,UserAction,UpdateType,
+  SortType,EditType,POINT_COUNT,
+  OFFER_COUNT,WAYPOINT_TYPES,
+  POINT_EMPTY, CITIES, DESCRIPTION,
+  BASE_PRICE,DESTINATION_COUNT,
+  Duration};
