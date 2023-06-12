@@ -1,22 +1,73 @@
 import Observable from '../framework/observable.js';
-import {POINT_COUNT,DESTINATION_COUNT,OFFER_COUNT,WAYPOINT_TYPES, CITIES} from '../const.js';
+import {POINT_COUNT,DESTINATION_COUNT,OFFER_COUNT,WAYPOINT_TYPES, CITIES, UpdateType} from '../const.js';
 import {getRandomArrayElement, getRandomInteger} from '../utils.js';
 import {generatePoint,generateDestination,generateCityDestination,generateOffer} from '../mock/points.js';
 
 export default class PointsModel extends Observable {
+  #pointsApiService = null;
   #destinations = [];
   #offers = [];
   #points = [];
 
-  constructor(){
+  constructor({pointsApiService}){
     super();
-    this.#destinations = this.generateDestinations();
-    this.#offers = this.generateOffers();
-    this.#points = this.generatePoints();
+    this.#pointsApiService = pointsApiService;
+
+    // this.#pointsApiService.points.then((points) => {
+    //   console.log(points.map(this.#adaptToClient));
+    // });
+
+    // this.#destinations = this.generateDestinations();
+    // this.#offers = this.generateOffers();
+    //this.#points = this.generatePoints();
   }
 
   get points(){
     return this.#points;
+  }
+
+  get allCities(){
+    return CITIES.map((city) => generateCityDestination(city));
+  }
+
+  get destinations(){
+    return this.#destinations;
+  }
+
+  get offers(){
+    return this.#offers;
+  }
+
+
+  async init(){
+    try{
+      const points = await this.#pointsApiService.points;
+      this.#points = points.map(this.#adaptToClient);
+
+      this.#destinations = await this.#pointsApiService.destinations;
+      this.#offers = await this.#pointsApiService.offers;
+
+        console.log(this.#points);
+        console.log(this.#destinations);
+        console.log(this.#offers);
+
+      // this.#tripPoints = tripPoints.map((tripPoint) => {
+      //   const offers = this.#offers.find(
+      //     (offer) => offer.type === tripPoint.type
+      //   );
+      //   const adaptedTripPoint = this.#adaptToClient(
+      //     tripPoint,
+      //     this.#destinations,
+      //     offers.offers
+      //   );
+      //   return adaptedTripPoint;
+      // });
+    } catch (err){
+      this.#points = [];
+      this.#destinations = [];
+      this.#offers = [];
+    }
+    this._notify(UpdateType.INIT);
   }
 
   updatePoint (updateType,update){
@@ -56,18 +107,6 @@ export default class PointsModel extends Observable {
     this._notify(updateType);
   }
 
-  get allCities(){
-    return CITIES.map((city) => generateCityDestination(city));
-  }
-
-  get destinations(){
-    return this.#destinations;
-  }
-
-  get offers(){
-    return this.#offers;
-  }
-
   getByType(type) {
     return this.#offers
       .find((offer) => offer.type === type).offers;
@@ -104,6 +143,33 @@ export default class PointsModel extends Observable {
         : [];
       return generatePoint(type, destination.id, offerIds);
     });
+  }
+
+  #adaptToClient(point, destinations, offers) {
+    const adaptedPoint = {
+      ...point,
+      dateFrom: point['date_from'] !== null ? new Date(point['date_from']) : point['date_from'],
+      dateTo: point['date_to'] !== null ? new Date(point['date_to']) : point['date_to'],
+      basePrice: point['base_price'],
+      isFavorite: point['is_favorite'],
+    };
+    // const adaptedDestination = destinations.find(
+    //   (destination) => destination.id === point.destination
+    // );
+    // adaptedPoint.destination = adaptedDestination;
+
+    // const adaptedOffers = [];
+    // adaptedPoint.offers.forEach((offerId) =>
+    //   adaptedOffers.push(offers.find((offer) => offer.id === offerId))
+    // );
+    // adaptedPoint.offers = adaptedOffers;
+
+    delete adaptedPoint['date_from'] ;
+    delete adaptedPoint['date_to'];
+    delete adaptedPoint['base_price'];
+    delete adaptedPoint['is_favorite'];
+
+    return adaptedPoint;
   }
 
 }

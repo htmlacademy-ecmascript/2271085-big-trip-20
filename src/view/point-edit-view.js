@@ -254,8 +254,6 @@ export default class PointEditView extends AbstractStatefulView {
       offerBlock.addEventListener('change', this.#offerCLickHandler);
     }
 
-    // this.#setDatepickerStart();
-    // this.#setDatepickerFinish();
     this.#setDatePicker();
   }
 

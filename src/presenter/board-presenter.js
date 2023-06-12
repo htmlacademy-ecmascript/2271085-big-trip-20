@@ -3,6 +3,7 @@ import {sortPointByTime, sortPointByPrice, sortPointByDay, filter} from '../util
 import EventListView from '../view/event-list-view';
 import SortView from '../view/sort-view';
 import EmptyView from '../view/empty-view.js';
+import LoadingView from '../view/loading-view.js';
 import PointPresenter from './point-presenter.js';
 import NewPointPresenter from './new-point-presenter.js';
 import { SortType,UserAction, UpdateType, FilterType } from '../const.js';
@@ -20,6 +21,8 @@ export default class BoardPresenter {
   #sortComponent = null;
   #eventListComponent = new EventListView();
   #emptyViewComponent = null;
+  #loadingComponent = new LoadingView();
+  #isLoading = true;
   #filterType = FilterType.EVERYTHING;
 
   constructor({container, pointsModel, filterModel}) {
@@ -85,6 +88,11 @@ export default class BoardPresenter {
         this.#clearBoard({resetSortType : true});
         this.#renderBoard();
         break;
+      case UpdateType.INIT:
+        this.#isLoading = false;
+        remove(this.#loadingComponent);
+        this.#renderBoard();
+        break;
     }
   };
 
@@ -115,6 +123,12 @@ export default class BoardPresenter {
 
   #renderBoard() {
     render(this.#eventListComponent, this.#container);
+
+    if(this.#isLoading){
+      this.#renderLoading();
+      return;
+    }
+
     if(this.points.length === 0 && !this.#isCreating){
       this.#renderMessage();
       return;
@@ -144,6 +158,7 @@ export default class BoardPresenter {
     this.#pointPresenters.clear();
     remove(this.#sortComponent);
     remove(this.#emptyViewComponent);
+    remove(this.#loadingComponent);
     if(resetSortType){
       this.#currentSortType = SortType.DAY;
     }
@@ -175,4 +190,8 @@ export default class BoardPresenter {
       this.#renderMessage();
     }
   };
+
+  #renderLoading() {
+    render(this.#loadingComponent, this.#eventListComponent.element, RenderPosition.AFTERBEGIN);
+  }
 }
