@@ -28,6 +28,7 @@ const boardPresenter = new BoardPresenter({
   container: tripEventsListElement,
   pointsModel,
   filterModel,
+  headerContainer: mainInfoElement,
 });
 
 render (new MainInfoView(), mainInfoElement, RenderPosition.AFTERBEGIN);
