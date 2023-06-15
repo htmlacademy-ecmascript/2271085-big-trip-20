@@ -14,7 +14,7 @@ const ButtonLabel = {
 
 function createPointEditTemplate ({state,pointOffers,allDestinations,formType}) {
 
-  const {type, basePrice, dateFrom, dateTo, offers, destination} = state;
+  const {type, basePrice, dateFrom, dateTo, offers, destination,isDisabled, isSaving, isDeleting} = state;
 
   const startRenderEditPointDate = humanizeRenderEditPointDate(dateFrom);
   const endRenderEditPointDate = humanizeRenderEditPointDate(dateTo);
@@ -51,8 +51,8 @@ function createPointEditTemplate ({state,pointOffers,allDestinations,formType}) 
             <span class="visually-hidden">Choose event type</span>
             <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
           </label>
-          <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
-
+          <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox"
+           ${isDisabled ? 'disabled' : ''}>
           <div class="event__type-list">
             <fieldset class="event__type-group">
               <legend class="visually-hidden">Event type</legend>
@@ -65,7 +65,8 @@ function createPointEditTemplate ({state,pointOffers,allDestinations,formType}) 
           <label class="event__label  event__type-output" for="event-destination-1">
             ${type}
           </label>
-          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(destination ? getStateDestination(destination).name : '')}" list="destination-list-1">
+          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(destination ? getStateDestination(destination).name : '')}" list="destination-list-1"
+          ${isDisabled ? 'disabled' : ''}>
           <datalist id="destination-list-1">
           ${createDestinationsList(allDestinations)}
           </datalist>
@@ -73,10 +74,12 @@ function createPointEditTemplate ({state,pointOffers,allDestinations,formType}) 
 
         <div class="event__field-group  event__field-group--time">
           <label class="visually-hidden" for="event-start-time-1">From</label>
-          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${he.encode(startRenderEditPointDate)}">
+          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${he.encode(startRenderEditPointDate)}"
+          ${isDisabled ? 'disabled' : ''}>
           &mdash;
           <label class="visually-hidden" for="event-end-time-1">To</label>
-          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${he.encode(endRenderEditPointDate)}">
+          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${he.encode(endRenderEditPointDate)}"
+          ${isDisabled ? 'disabled' : ''}>
         </div>
 
         <div class="event__field-group  event__field-group--price">
@@ -84,10 +87,11 @@ function createPointEditTemplate ({state,pointOffers,allDestinations,formType}) 
             <span class="visually-hidden">Price</span>
             &euro;
           </label>
-          <input class="event__input  event__input--price" id="event-price-1" type="number" min="0" name="event-price" value=${basePrice}>
+          <input class="event__input  event__input--price" id="event-price-1" type="number" min="0" name="event-price" value=${basePrice}
+          ${isDisabled ? 'disabled' : ''}>
         </div>
 
-        ${createPointEditControlsTemplate({formType})}
+        ${createPointEditControlsTemplate({formType, isSaving, isDeleting, isDisabled})}
       </header>
       <section class="event__details">
         <section class="event__section  event__section--offers">
@@ -115,18 +119,18 @@ function createPointEditTemplate ({state,pointOffers,allDestinations,formType}) 
   );
 }
 
-function createDeleteButtonTemplate({formType}) {
-  return `<button class="event__reset-btn" type="reset">${ButtonLabel[formType]}</button>`;
+function createDeleteButtonTemplate({formType, isDisabled, isDeleting}) {
+  return `<button class="event__reset-btn" type="reset"  ${isDisabled ? 'disabled' : ''}>${isDeleting ? 'Deleting...' : ButtonLabel[formType]}</button>`;
 }
 
 function createRollupButtonTemplate() {
   return '<button class="event__rollup-btn" type="button"><span class="visually-hidden">Open event</span></button>';
 }
 
-function createPointEditControlsTemplate({formType}) {
+function createPointEditControlsTemplate({formType, isSaving, isDisabled, isDeleting}) {
   return`
-    <button class="event__save-btn btn btn--blue" type="submit">Save</button>
-    ${createDeleteButtonTemplate({formType})}
+    <button class="event__save-btn btn btn--blue" type="submit"  ${isDisabled ? 'disabled' : ''}>${isSaving ? 'Saving...' : 'Save'}</button>
+    ${createDeleteButtonTemplate({formType,isDisabled, isDeleting })}
     ${(formType !== EditType.CREATING) ? createRollupButtonTemplate() : ''}
   `;
 }
@@ -375,7 +379,22 @@ export default class PointEditView extends AbstractStatefulView {
     );
   }
 
-  static parsePointToState = (point) => ({...point});
+  static parsePointToState(point) {
+    return {
+      ...point,
+      isDisabled: false,
+      isSaving: false,
+      isDeleting: false,
+    };
+  }
 
-  static parseStateToPoint = (state) => ({...state});
+  static parseStateToPoint (state) {
+    const point = {...state};
+
+    delete point.isDisabled;
+    delete point.isDeleting;
+    delete point.isSaving;
+
+    return point;
+  }
 }

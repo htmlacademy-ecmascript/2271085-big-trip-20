@@ -71,7 +71,13 @@ export default class NewPointPresenter {
       UpdateType.MINOR,
       update
     );
-    this.destroy();
   };
+
+  setSaving() {
+    this.#pointNewComponent.updateElement({
+      isDisabled: true,
+      isSaving: true,
+    });
+  }
 
 }
