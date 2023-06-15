@@ -80,4 +80,15 @@ export default class NewPointPresenter {
     });
   }
 
+  setAborting() {
+    const resetFormState = () => {
+      this.#pointNewComponent.updateElement({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+    this.#pointNewComponent.shake(resetFormState);
+  }
+
 }
