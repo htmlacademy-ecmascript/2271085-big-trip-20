@@ -1,37 +1,66 @@
 import Observable from '../framework/observable.js';
-import {POINT_COUNT,DESTINATION_COUNT,OFFER_COUNT,WAYPOINT_TYPES, CITIES} from '../const.js';
-import {getRandomArrayElement, getRandomInteger} from '../utils.js';
-import {generatePoint,generateDestination,generateCityDestination,generateOffer} from '../mock/points.js';
-
+import { UpdateType} from '../const.js';
 export default class PointsModel extends Observable {
+  #pointsApiService = null;
   #destinations = [];
   #offers = [];
   #points = [];
 
-  constructor(){
+  constructor({pointsApiService}){
     super();
-    this.#destinations = this.generateDestinations();
-    this.#offers = this.generateOffers();
-    this.#points = this.generatePoints();
+    this.#pointsApiService = pointsApiService;
   }
 
   get points(){
     return this.#points;
   }
 
-  updatePoint (updateType,update){
+  get destinations(){
+    return this.#destinations;
+  }
+
+  get offers(){
+    return this.#offers;
+  }
+
+
+  async init(){
+    try{
+      const points = await this.#pointsApiService.points;
+      this.#points = points.map(this.#adaptToClient);
+
+      this.#destinations = await this.#pointsApiService.destinations;
+      this.#offers = await this.#pointsApiService.offers;
+
+    } catch (err){
+      this.#points = [];
+      this.#destinations = [];
+      this.#offers = [];
+    }
+    this._notify(UpdateType.INIT);
+  }
+
+  async updatePoint (updateType,update){
+
     const index = this.#points.findIndex((point) => point.id === update.id);
 
     if(index === -1) {
       throw new Error('Can\'t update unexisting point');
     }
 
-    this.#points = [
-      ...this.#points.slice(0, index),
-      update,
-      ...this.#points.slice(index + 1)
-    ];
-    this._notify(updateType,update);
+    try {
+      const response = await this.#pointsApiService.updatePoint(update);
+      const updatedPoint = this.#adaptToClient(response);
+
+      this.#points = [
+        ...this.#points.slice(0, index),
+        updatedPoint,
+        ...this.#points.slice(index + 1)
+      ];
+      this._notify(updateType,updatedPoint);
+    } catch (err){
+      throw new Error('Can\'t update point');
+    }
   }
 
   addPoint(updateType, update){
@@ -56,18 +85,6 @@ export default class PointsModel extends Observable {
     this._notify(updateType);
   }
 
-  get allCities(){
-    return CITIES.map((city) => generateCityDestination(city));
-  }
-
-  get destinations(){
-    return this.#destinations;
-  }
-
-  get offers(){
-    return this.#offers;
-  }
-
   getByType(type) {
     return this.#offers
       .find((offer) => offer.type === type).offers;
@@ -78,32 +95,21 @@ export default class PointsModel extends Observable {
       .find((destination) => destination.id === id);
   }
 
-  generateDestinations() {
-    return Array.from({length:DESTINATION_COUNT}, (_,index) => generateDestination(index)
-    );
-  }
+  #adaptToClient(point) {
+    const adaptedPoint = {
+      ...point,
+      dateFrom: point['date_from'] !== null ? new Date(point['date_from']) : point['date_from'],
+      dateTo: point['date_to'] !== null ? new Date(point['date_to']) : point['date_to'],
+      basePrice: point['base_price'],
+      isFavorite: point['is_favorite'],
+    };
 
-  generateOffers(){
-    return WAYPOINT_TYPES.map((type) => ({
-      type,
-      offers: Array.from({length: getRandomInteger(0,OFFER_COUNT)}, () => generateOffer(type))
-    }));
-  }
+    delete adaptedPoint['date_from'] ;
+    delete adaptedPoint['date_to'];
+    delete adaptedPoint['base_price'];
+    delete adaptedPoint['is_favorite'];
 
-  generatePoints(){
-    return Array.from({length: POINT_COUNT}, () => {
-      const type = getRandomArrayElement(WAYPOINT_TYPES);
-      const destination = getRandomArrayElement(this.#destinations);
-      const hasOffers = getRandomInteger(0,1);
-      const offersByType = this.#offers
-        .find((offerByType) => offerByType.type === type);
-      const offerIds = (hasOffers)
-        ? offersByType.offers
-          .slice(0,getRandomInteger(0,OFFER_COUNT))
-          .map((offer) => offer.id)
-        : [];
-      return generatePoint(type, destination.id, offerIds);
-    });
+    return adaptedPoint;
   }
 
 }
