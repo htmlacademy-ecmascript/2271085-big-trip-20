@@ -1,6 +1,23 @@
 import AbstractView from '../framework/view/abstract-view.js';
 
-function createMainInfoTemplate () {
+function createMainInfoTemplate (points, destinations, offers) {
+
+  console.log('points in template',points);
+  console.log('destinations in tmplate', destinations);
+  const tripDestinations = [];
+
+  let sum = 0;
+
+  points.forEach((point) => {
+
+console.log('point-destination', point.destination.id);
+    const city = destinations.find((destination) => destination.id === point.destination.id);
+    tripDestinations.push(city.destination.name);
+    console.log('tripDestinations', tripDestinations);
+
+  });
+
+
   return (
     `<section class="trip-main__trip-info  trip-info">
     <div class="trip-info__main">
@@ -17,7 +34,20 @@ function createMainInfoTemplate () {
 }
 
 export default class MainInfoView extends AbstractView {
+
+  #points = null;
+  #destinations = null;
+  #offers = null;
+
+  constructor(points, destinations, offers){
+    super();
+    this.#points = points;
+    this.#destinations = destinations;
+    this.#offers = offers;
+
+  }
+
   get template() {
-    return createMainInfoTemplate();
+    return createMainInfoTemplate(this.#points, this.#destinations, this.#offers);
   }
 }

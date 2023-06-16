@@ -8,6 +8,7 @@ import LoadingView from '../view/loading-view.js';
 import PointPresenter from './point-presenter.js';
 import NewPointPresenter from './new-point-presenter.js';
 import NewPointButtonView from '../view/nev-event-button.-view.js';
+import MainInfoView from '../view/main-info-view.js';
 import { SortType,UserAction, UpdateType, FilterType } from '../const.js';
 
 const TimeLimit = {
@@ -31,6 +32,7 @@ export default class BoardPresenter {
   #isLoading = true;
   #filterType = FilterType.EVERYTHING;
   #headerContainer = null;
+  #mainInfoComponent = new MainInfoView();
   #uiBlocker = new UiBlocker({
     lowerLimit: TimeLimit.LOWER_LIMIT,
     upperLimit: TimeLimit.UPPER_LIMIT
@@ -71,6 +73,7 @@ export default class BoardPresenter {
 
   init(){
     this.#renderBoard();
+    //this.#renderTripInfo();
     render(this.#newEventButton, this.#headerContainer);
   }
 
@@ -111,23 +114,33 @@ export default class BoardPresenter {
     switch (updateType){
       case UpdateType.PATCH:
         this.#pointPresenters.get(data.id).init(data);
+        this.#renderTripInfo();
         break;
       case UpdateType.MINOR:
         this.#clearBoard();
         this.#renderBoard();
+        this.#renderTripInfo();
         break;
       case UpdateType.MAJOR:
         this.#clearBoard({resetSortType : true});
         this.#renderBoard();
+        this.#renderTripInfo();
         break;
       case UpdateType.INIT:
         this.#isLoading = false;
         this.#newEventButton.element.disabled = false;
         remove(this.#loadingComponent);
         this.#renderBoard();
+        this.#renderTripInfo();
         break;
     }
   };
+
+  #renderTripInfo(){
+    console.log('render - destinations',this.#pointsModel.destinations);
+    this.#mainInfoComponent = new MainInfoView(this.#pointsModel.points, this.#pointsModel.destinations, this.#pointsModel.offers);
+    render (this.#mainInfoComponent,this.#headerContainer, RenderPosition.AFTERBEGIN);
+  }
 
   #handleSortTypeChange = (sortType) => {
     if(this.#currentSortType === sortType){
@@ -156,6 +169,7 @@ export default class BoardPresenter {
 
   #renderBoard() {
     render(this.#eventListComponent, this.#container);
+
 
     if(this.#isLoading){
       this.#renderLoading();
@@ -187,12 +201,14 @@ export default class BoardPresenter {
   }
 
   #clearBoard({resetSortType = false} = {}) {
+
     this.#newEventPresenter.destroy();
     this.#pointPresenters.forEach((presenter) => presenter.destroy());
     this.#pointPresenters.clear();
     remove(this.#sortComponent);
     remove(this.#emptyViewComponent);
     remove(this.#loadingComponent);
+    remove(this.#mainInfoComponent);
     if(resetSortType){
       this.#currentSortType = SortType.DAY;
     }
