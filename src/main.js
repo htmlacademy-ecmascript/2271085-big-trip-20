@@ -1,10 +1,8 @@
-import {render, RenderPosition} from './framework/render.js';
-//import MainInfoView from './view/main-info-view.js';
 import BoardPresenter from './presenter/board-presenter.js';
 import PointsModel from './model/points-model.js';
 import FilterModel from './model/filter-model.js';
 import FilterPresenter from './presenter/filter-presenter.js';
-//import MainInfoPresenter from './presenter/trip-info-presenter.js';
+
 import PointsApiService from './points-api-service.js';
 
 const AUTHORIZATION = 'Basic fjkl449c-fkdlkj61-d';
@@ -19,11 +17,6 @@ const pointsModel = new PointsModel({
 });
 const filterModel = new FilterModel();
 
-// const mainInfoPresenter = new MainInfoPresenter({
-//   container: mainInfoElement,
-//   pointsModel
-// });
-
 const filterPresenter = new FilterPresenter ({
   container: tripFiltersElement,
   pointsModel,
@@ -37,8 +30,6 @@ const boardPresenter = new BoardPresenter({
   headerContainer: mainInfoElement,
 });
 
-//render (new MainInfoView(), mainInfoElement, RenderPosition.AFTERBEGIN);
-//mainInfoPresenter.init();
 filterPresenter.init();
 boardPresenter.init();
 pointsModel.init();
