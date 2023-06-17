@@ -137,7 +137,6 @@ export default class BoardPresenter {
   };
 
   #renderTripInfo(){
-    console.log('render - destinations',this.#pointsModel.destinations);
     this.#mainInfoComponent = new MainInfoView(this.#pointsModel.points, this.#pointsModel.destinations, this.#pointsModel.offers);
     render (this.#mainInfoComponent,this.#headerContainer, RenderPosition.AFTERBEGIN);
   }

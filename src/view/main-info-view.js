@@ -1,33 +1,50 @@
 import AbstractView from '../framework/view/abstract-view.js';
+import {humanizeRenderPointDate} from '../utils.js';
+
+function calculateDuration (startDate, endDate){
+
+  if (startDate === endDate){
+    return startDate;
+  }
+
+  const end = endDate.split(' ');
+
+  return `${startDate}&nbsp;&mdash;&nbsp;${end[1]}`;
+}
 
 function createMainInfoTemplate (points, destinations, offers) {
 
-  console.log('points in template',points);
-  console.log('destinations in tmplate', destinations);
   const tripDestinations = [];
+  const maxDestination = 3;
 
   let sum = 0;
 
   points.forEach((point) => {
+    const city = destinations.find((destination) => destination.id === point.destination);
+    tripDestinations.push(city.name);
 
-console.log('point-destination', point.destination.id);
-    const city = destinations.find((destination) => destination.id === point.destination.id);
-    tripDestinations.push(city.destination.name);
-    console.log('tripDestinations', tripDestinations);
+    const typeOffers = offers.find((item) => item.type === point.type).offers;
+    const offersById = typeOffers.filter((item) => point.offers.includes(item.id));
+    const offersPrice = offersById.reduce((total, offer) => total + offer.price, 0);
+
+    sum += point.basePrice + offersPrice;
 
   });
+
+  const startDate = humanizeRenderPointDate(points[0].dateFrom);
+  const endDate = humanizeRenderPointDate(points[points.length - 1].dateTo);
 
 
   return (
     `<section class="trip-main__trip-info  trip-info">
     <div class="trip-info__main">
-      <h1 class="trip-info__title">Amsterdam &mdash; Chamonix &mdash; Geneva</h1>
+      <h1 class="trip-info__title">${tripDestinations.length > maxDestination ? `${tripDestinations[0]} &mdash; ... &mdash; ${tripDestinations[tripDestinations.length - 1]}` : tripDestinations.join(' &mdash; ')}</h1>
 
-      <p class="trip-info__dates">Mar 18&nbsp;&mdash;&nbsp;20</p>
+      <p class="trip-info__dates">${calculateDuration(startDate,endDate)}</p>
     </div>
 
     <p class="trip-info__cost">
-      Total: &euro;&nbsp;<span class="trip-info__cost-value">1230</span>
+      Total: &euro;&nbsp;<span class="trip-info__cost-value">${sum}</span>
     </p>
   </section>`
   );
