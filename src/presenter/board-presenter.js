@@ -73,7 +73,6 @@ export default class BoardPresenter {
 
   init(){
     this.#renderBoard();
-    //this.#renderTripInfo();
     render(this.#newEventButton, this.#headerContainer);
   }
 
@@ -141,15 +140,6 @@ export default class BoardPresenter {
     render (this.#mainInfoComponent,this.#headerContainer, RenderPosition.AFTERBEGIN);
   }
 
-  #handleSortTypeChange = (sortType) => {
-    if(this.#currentSortType === sortType){
-      return;
-    }
-    this.#currentSortType = sortType;
-    this.#clearBoard();
-    this.#renderBoard();
-  };
-
   #renderSort() {
     this.#sortComponent = new SortView({
       sorts: Object.values(SortType),
@@ -187,6 +177,11 @@ export default class BoardPresenter {
     }
   }
 
+  #createPoint () {
+    this.#currentSortType = SortType.DAY;
+    this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
+    this.#newEventPresenter.init();
+  }
 
   #renderPoint(point) {
     const pointPresenter = new PointPresenter({
@@ -197,6 +192,10 @@ export default class BoardPresenter {
     });
     pointPresenter.init(point);
     this.#pointPresenters.set(point.id, pointPresenter);
+  }
+
+  #renderLoading() {
+    render(this.#loadingComponent, this.#eventListComponent.element, RenderPosition.AFTERBEGIN);
   }
 
   #clearBoard({resetSortType = false} = {}) {
@@ -213,23 +212,20 @@ export default class BoardPresenter {
     }
   }
 
+  #handleSortTypeChange = (sortType) => {
+    if(this.#currentSortType === sortType){
+      return;
+    }
+    this.#currentSortType = sortType;
+    this.#clearBoard();
+    this.#renderBoard();
+    this.#renderTripInfo();
+  };
+
   #handleModeChange = () => {
     this.#newEventPresenter.destroy();
     this.#pointPresenters.forEach((presenter) => presenter.resetView());
   };
-
-  #onNewEventClick = () => {
-    this.#isCreating = true;
-    this.#newEventButton.element.disabled = true;
-    remove(this.#emptyViewComponent);
-    this.#createPoint();
-  };
-
-  #createPoint () {
-    this.#currentSortType = SortType.DAY;
-    this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
-    this.#newEventPresenter.init();
-  }
 
   #handleNewPointFormClose = () => {
     this.#isCreating = false;
@@ -240,7 +236,11 @@ export default class BoardPresenter {
     }
   };
 
-  #renderLoading() {
-    render(this.#loadingComponent, this.#eventListComponent.element, RenderPosition.AFTERBEGIN);
-  }
+  #onNewEventClick = () => {
+    this.#isCreating = true;
+    this.#newEventButton.element.disabled = true;
+    remove(this.#emptyViewComponent);
+    this.#createPoint();
+  };
+
 }
