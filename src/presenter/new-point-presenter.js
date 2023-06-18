@@ -31,12 +31,12 @@ export default class NewPointPresenter {
       allDestinations: this.#pointsModel.destinations,
       pointOffers: this.#pointsModel.offers,
       formType: EditType.CREATING,
-      onResetClick: this.#handlerResetButtonClick,
-      onSubmitClick: this.#handlerPointSubmit,
+      onResetClick: this.#handleResetButtonClick,
+      onSubmitClick: this.#handlePointSubmit,
     });
 
     render(this.#pointNewComponent, this.#container, RenderPosition.AFTERBEGIN);
-    document.addEventListener('keydown', this.#escKeyDownHandler);
+    document.addEventListener('keydown', this.#onEscKeydown);
   }
 
   destroy () {
@@ -48,30 +48,8 @@ export default class NewPointPresenter {
     remove(this.#pointNewComponent);
     this.#pointNewComponent = null;
 
-    document.removeEventListener('keydown', this.#escKeyDownHandler);
+    document.removeEventListener('keydown', this.#onEscKeydown);
   }
-
-  #escKeyDownHandler = (evt) => {
-    if (evt.key === 'Escape') {
-      evt.preventDefault();
-      this.destroy();
-    }
-  };
-
-  #handlerResetButtonClick = () =>{
-    this.destroy();
-  };
-
-  #handlerPointSubmit = (update) => {
-    if (!update.destination){
-      return;
-    }
-    this.#handleDataChange(
-      UserAction.ADD_POINT,
-      UpdateType.MINOR,
-      update
-    );
-  };
 
   setSaving() {
     this.#pointNewComponent.updateElement({
@@ -79,6 +57,7 @@ export default class NewPointPresenter {
       isSaving: true,
     });
   }
+
 
   setAborting() {
     const resetFormState = () => {
@@ -90,5 +69,27 @@ export default class NewPointPresenter {
     };
     this.#pointNewComponent.shake(resetFormState);
   }
+
+  #handleResetButtonClick = () =>{
+    this.destroy();
+  };
+
+  #handlePointSubmit = (update) => {
+    if (!update.destination){
+      return;
+    }
+    this.#handleDataChange(
+      UserAction.ADD_POINT,
+      UpdateType.MINOR,
+      update
+    );
+  };
+
+  #onEscKeydown = (evt) => {
+    if (evt.key === 'Escape') {
+      evt.preventDefault();
+      this.destroy();
+    }
+  };
 
 }

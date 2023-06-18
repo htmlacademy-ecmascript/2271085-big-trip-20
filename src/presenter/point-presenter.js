@@ -35,7 +35,7 @@ export default class PointPresenter{
       point: this.#point,
       pointDestination: this.#pointsModel.getById(point.destination),
       pointOffers: this.#pointsModel.offers,
-      onEditClick: this.#handlerPointEditClick,
+      onEditClick: this.#handlePointEditClick,
       onFavoriteClick: this.#handleFavoriteClick,
     });
 
@@ -44,8 +44,8 @@ export default class PointPresenter{
       pointDestination: this.#pointsModel.getById(point.destination),
       allDestinations: this.#pointsModel.destinations,
       pointOffers: this.#pointsModel.offers,
-      onResetClick: this.#handlerResetButtonClick,
-      onSubmitClick: this.#handlerPointSubmit,
+      onResetClick: this.#handleResetButtonClick,
+      onSubmitClick: this.#handlePointSubmit,
       onDeleteClick: this.#handleDeleteClick,
     });
 
@@ -78,62 +78,6 @@ export default class PointPresenter{
       this.#replaceFormToPoint();
     }
   }
-
-  #replacePointToForm() {
-    replace(this.#pointEditComponent, this.#pointComponent);
-    document.addEventListener('keydown', this.#escKeyDownHandler);
-    this.#handleModeChange();
-    this.#mode = Mode.EDITING;
-  }
-
-  #replaceFormToPoint() {
-    replace(this.#pointComponent, this.#pointEditComponent);
-    document.removeEventListener('keydown', this.#escKeyDownHandler);
-    this.#mode = Mode.DEFAULT;
-  }
-
-  #escKeyDownHandler = (evt) => {
-    if(evt.key === 'Escape' || evt.key === 'esc'){
-      evt.preventDefault();
-      this.#pointEditComponent.reset(this.#point);
-      this.#replaceFormToPoint();
-      document.removeEventListener('keydown', this.#escKeyDownHandler);
-    }
-  };
-
-  #handlerPointEditClick = () => {
-    this.#replacePointToForm();
-    document.addEventListener('keydown', this.#escKeyDownHandler);
-  };
-
-  #handlerResetButtonClick = () =>{
-    this.#pointEditComponent.reset(this.#point);
-    this.#replaceFormToPoint();
-    document.removeEventListener('keydown', this.#escKeyDownHandler);
-  };
-
-  #handleFavoriteClick = () =>{
-    this.#handleDataChange(
-      UserAction.UPDATE_POINT,
-      UpdateType.MINOR,{...this.#point, isFavorite: !this.#point.isFavorite});
-  };
-
-  #handleDeleteClick = (update) => {
-    this.#handleDataChange(
-      UserAction.DELETE_POINT,
-      UpdateType.MINOR,
-      update
-    );
-  };
-
-  #handlerPointSubmit = (update) => {
-    this.#handleDataChange(
-      UserAction.UPDATE_POINT,
-      UpdateType.MINOR,
-      update
-    );
-    document.removeEventListener('keydown', this.#escKeyDownHandler);
-  };
 
   setSaving() {
     if (this.#mode === Mode.EDITING) {
@@ -168,4 +112,60 @@ export default class PointPresenter{
     this.#pointEditComponent.shake(resetFormState);
   }
 
+
+  #replacePointToForm() {
+    replace(this.#pointEditComponent, this.#pointComponent);
+    document.addEventListener('keydown', this.#onEscKeydown);
+    this.#handleModeChange();
+    this.#mode = Mode.EDITING;
+  }
+
+  #replaceFormToPoint() {
+    replace(this.#pointComponent, this.#pointEditComponent);
+    document.removeEventListener('keydown', this.#onEscKeydown);
+    this.#mode = Mode.DEFAULT;
+  }
+
+  #handlePointEditClick = () => {
+    this.#replacePointToForm();
+    document.addEventListener('keydown', this.#onEscKeydown);
+  };
+
+  #handleResetButtonClick = () =>{
+    this.#pointEditComponent.reset(this.#point);
+    this.#replaceFormToPoint();
+    document.removeEventListener('keydown', this.#onEscKeydown);
+  };
+
+  #handleFavoriteClick = () =>{
+    this.#handleDataChange(
+      UserAction.UPDATE_POINT,
+      UpdateType.MINOR,{...this.#point, isFavorite: !this.#point.isFavorite});
+  };
+
+  #handleDeleteClick = (update) => {
+    this.#handleDataChange(
+      UserAction.DELETE_POINT,
+      UpdateType.MINOR,
+      update
+    );
+  };
+
+  #handlePointSubmit = (update) => {
+    this.#handleDataChange(
+      UserAction.UPDATE_POINT,
+      UpdateType.MINOR,
+      update
+    );
+    document.removeEventListener('keydown', this.#onEscKeydown);
+  };
+
+  #onEscKeydown = (evt) => {
+    if(evt.key === 'Escape' || evt.key === 'esc'){
+      evt.preventDefault();
+      this.#pointEditComponent.reset(this.#point);
+      this.#replaceFormToPoint();
+      document.removeEventListener('keydown', this.#onEscKeydown);
+    }
+  };
 }

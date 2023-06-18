@@ -1,5 +1,5 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import {humanizeRenderPointDate} from '../utils.js';
+import {humanizeRenderPointDate, sortPointByDay} from '../utils.js';
 
 function calculateDuration (startDate, endDate){
 
@@ -7,9 +7,10 @@ function calculateDuration (startDate, endDate){
     return startDate;
   }
 
-  const end = endDate.split(' ');
+  const start = startDate.split(' ').reverse();
+  const end = endDate.split(' ').reverse();
 
-  return `${startDate}&nbsp;&mdash;&nbsp;${end[1]}`;
+  return `${start.join(' ')}&nbsp;&mdash;&nbsp;${end.join(' ')}`;
 }
 
 function createMainInfoTemplate (points, destinations, offers) {
@@ -31,8 +32,9 @@ function createMainInfoTemplate (points, destinations, offers) {
 
   });
 
-  const startDate = humanizeRenderPointDate(points[0].dateFrom);
-  const endDate = humanizeRenderPointDate(points[points.length - 1].dateTo);
+  const sortedPoints = points.sort(sortPointByDay);
+  const startDate = humanizeRenderPointDate(sortedPoints[0].dateFrom);
+  const endDate = humanizeRenderPointDate(sortedPoints[sortedPoints.length - 1].dateTo);
 
 
   return (
