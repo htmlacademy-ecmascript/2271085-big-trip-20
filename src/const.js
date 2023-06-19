@@ -2,7 +2,7 @@ const WAYPOINT_TYPES = [ 'taxi','bus','train','ship','drive','flight','check-in'
 
 const DEFAULT_TYPE = 'flight';
 const POINT_EMPTY = {
-  basePrice: 1,
+  basePrice: 0,
   dateFrom: new Date(),
   dateTo: new Date(),
   destination: '',

@@ -5,6 +5,7 @@ export default class PointsModel extends Observable {
   #destinations = [];
   #offers = [];
   #points = [];
+  #isServerUnavailable = false;
 
   constructor({pointsApiService}){
     super();
@@ -36,8 +37,11 @@ export default class PointsModel extends Observable {
       this.#points = [];
       this.#destinations = [];
       this.#offers = [];
+      this.#isServerUnavailable = true;
     }
-    this._notify(UpdateType.INIT);
+    this._notify(UpdateType.INIT, {
+      isServerUnavailable: this.#isServerUnavailable,
+    });
   }
 
   async updatePoint (updateType,update){
@@ -59,6 +63,7 @@ export default class PointsModel extends Observable {
       ];
       this._notify(updateType,updatedPoint);
     } catch (err){
+      this.#points = [];
       throw new Error('Can\'t update point');
     }
   }

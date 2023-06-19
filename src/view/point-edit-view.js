@@ -15,6 +15,7 @@ const ButtonLabel = {
 function createPointEditTemplate ({state,pointOffers,allDestinations,formType}) {
 
   const {type, basePrice, dateFrom, dateTo, offers, destination,isDisabled, isSaving, isDeleting} = state;
+  console.log('destination',destination);
 
   const startRenderEditPointDate = humanizeRenderEditPointDate(dateFrom);
   const endRenderEditPointDate = humanizeRenderEditPointDate(dateTo);
@@ -31,7 +32,7 @@ function createPointEditTemplate ({state,pointOffers,allDestinations,formType}) 
   const checkedOffers = generatePointEditOffers(type,pointOffers);
 
   function getStateDestination(newDestination){
-    const data = allDestinations.find((punkt) => punkt.id === newDestination);
+    const data = allDestinations.find((item) => item.id === newDestination);
     return data;
   }
 
@@ -87,7 +88,7 @@ function createPointEditTemplate ({state,pointOffers,allDestinations,formType}) 
             <span class="visually-hidden">Price</span>
             &euro;
           </label>
-          <input class="event__input  event__input--price" id="event-price-1" type="number" min="0" name="event-price" value=${basePrice}
+          <input class="event__input  event__input--price" id="event-price-1" type="number" min="0" name="event-price" value=${basePrice === 0 ? '' : basePrice}
           ${isDisabled ? 'disabled' : ''}>
         </div>
 
@@ -103,7 +104,7 @@ function createPointEditTemplate ({state,pointOffers,allDestinations,formType}) 
           </div>
         </section>
 
-        <section class="event__section  event__section--destination">
+        <section class="event__section  event__section--destination"  ${destination === '' ? 'visually-hidden' : ''}>
           <h3 class="event__section-title  event__section-title--destination">Destination</h3>
           <p class="event__destination-description">${ destination ? getStateDestination(destination).description : ''}</p>
 
@@ -198,7 +199,6 @@ export default class PointEditView extends AbstractStatefulView {
   get template() {
     return createPointEditTemplate({
       state : this._state,
-      pointDestination : this.#destination,
       pointOffers : this.#pointOffers,
       allDestinations: this.#allDestinations,
       formType: this.#formType
