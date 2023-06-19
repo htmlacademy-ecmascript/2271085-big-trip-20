@@ -15,7 +15,6 @@ const ButtonLabel = {
 function createPointEditTemplate ({state,pointOffers,allDestinations,formType}) {
 
   const {type, basePrice, dateFrom, dateTo, offers, destination,isDisabled, isSaving, isDeleting} = state;
-  console.log('destination',destination);
 
   const startRenderEditPointDate = humanizeRenderEditPointDate(dateFrom);
   const endRenderEditPointDate = humanizeRenderEditPointDate(dateTo);
@@ -36,7 +35,7 @@ function createPointEditTemplate ({state,pointOffers,allDestinations,formType}) 
     return data;
   }
 
-  function getPhotosSRC(place){
+  function getPhotoAddress(place){
 
     const data = place.pictures.map((picture) => (`<img class="event__photo" src="${picture.src}" alt="Event photo">`
     )).join('');
@@ -104,13 +103,13 @@ function createPointEditTemplate ({state,pointOffers,allDestinations,formType}) 
           </div>
         </section>
 
-        <section class="event__section  event__section--destination"  ${destination === '' ? 'visually-hidden' : ''}>
+        <section class="event__section  event__section--destination ${destination === '' ? 'visually-hidden' : ''}">
           <h3 class="event__section-title  event__section-title--destination">Destination</h3>
           <p class="event__destination-description">${ destination ? getStateDestination(destination).description : ''}</p>
 
           <div class="event__photos-container">
             <div class="event__photos-tape">
-            ${ destination ? getPhotosSRC(getStateDestination(destination)) : ''}
+            ${ destination ? getPhotoAddress(getStateDestination(destination)) : ''}
             </div>
           </div>
         </section>
