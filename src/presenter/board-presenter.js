@@ -7,8 +7,9 @@ import EmptyView from '../view/empty-view.js';
 import LoadingView from '../view/loading-view.js';
 import PointPresenter from './point-presenter.js';
 import NewPointPresenter from './new-point-presenter.js';
-import NewPointButtonView from '../view/nev-event-button.-view.js';
+import NewPointButtonView from '../view/new-event-button-view.js';
 import MainInfoView from '../view/main-info-view.js';
+import ServerUnavailableView from '../view/unavailable-server-view.js';
 import { SortType,UserAction, UpdateType, FilterType } from '../const.js';
 
 const TimeLimit = {
@@ -32,7 +33,8 @@ export default class BoardPresenter {
   #isLoading = true;
   #filterType = FilterType.EVERYTHING;
   #headerContainer = null;
-  #mainInfoComponent = new MainInfoView();
+  #mainInfoComponent = null;
+  #serverUnavailableComponent = new ServerUnavailableView();
   #uiBlocker = new UiBlocker({
     lowerLimit: TimeLimit.LOWER_LIMIT,
     upperLimit: TimeLimit.UPPER_LIMIT
@@ -47,7 +49,7 @@ export default class BoardPresenter {
     this.#pointsModel.addObserver(this.#handleModelEvent);
     this.#filterModel.addObserver(this.#handleModelEvent);
 
-    this.#newEventButton = new NewPointButtonView(this.#onNewEventClick);
+    this.#newEventButton = new NewPointButtonView(this.#handleNewEventClick);
 
     this.#newEventPresenter = new NewPointPresenter({
       container: this.#eventListComponent.element,
@@ -129,6 +131,11 @@ export default class BoardPresenter {
         this.#isLoading = false;
         this.#newEventButton.element.disabled = false;
         remove(this.#loadingComponent);
+        remove(this.#serverUnavailableComponent);
+        if (data.isServerUnavailable) {
+          this.#renderServerUnavailable();
+          break;
+        }
         this.#renderBoard();
         this.#renderTripInfo();
         break;
@@ -136,6 +143,10 @@ export default class BoardPresenter {
   };
 
   #renderTripInfo(){
+
+    if(this.#pointsModel.points.length === 0){
+      return;
+    }
     this.#mainInfoComponent = new MainInfoView(this.#pointsModel.points, this.#pointsModel.destinations, this.#pointsModel.offers);
     render (this.#mainInfoComponent,this.#headerContainer, RenderPosition.AFTERBEGIN);
   }
@@ -198,6 +209,12 @@ export default class BoardPresenter {
     render(this.#loadingComponent, this.#eventListComponent.element, RenderPosition.AFTERBEGIN);
   }
 
+  #renderServerUnavailable() {
+    this.#newEventButton.element.disabled = true;
+    render(this.#serverUnavailableComponent, this.#container);
+  }
+
+
   #clearBoard({resetSortType = false} = {}) {
 
     this.#newEventPresenter.destroy();
@@ -206,7 +223,9 @@ export default class BoardPresenter {
     remove(this.#sortComponent);
     remove(this.#emptyViewComponent);
     remove(this.#loadingComponent);
-    remove(this.#mainInfoComponent);
+    if(this.#mainInfoComponent){
+      remove(this.#mainInfoComponent);
+    }
     if(resetSortType){
       this.#currentSortType = SortType.DAY;
     }
@@ -236,7 +255,7 @@ export default class BoardPresenter {
     }
   };
 
-  #onNewEventClick = () => {
+  #handleNewEventClick = () => {
     this.#isCreating = true;
     this.#newEventButton.element.disabled = true;
     remove(this.#emptyViewComponent);
